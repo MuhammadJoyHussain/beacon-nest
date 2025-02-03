@@ -1,71 +1,68 @@
 'use client'
-import { useState } from 'react'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Search, MapPin, Briefcase } from 'lucide-react'
 
-export default function SearchBar() {
-  const [industry, setIndustry] = useState('Industry')
-  const [location, setLocation] = useState('Location')
+import React from 'react'
+import Image from 'next/image'
 
+export default function HiringBanner() {
   return (
-    <div className='flex items-center bg-white shadow-md rounded-full px-6 py-3 w-full max-w-3xl border border-gray-200'>
-      {/* Industry Dropdown */}
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger className='flex items-center text-gray-600 cursor-pointer'>
-          <Briefcase className='w-5 h-5 mr-2 text-gray-500' />
-          <span className='text-sm font-medium'>{industry}</span>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content className='bg-white shadow-md rounded-md p-2 w-36'>
-            {['Technology', 'Healthcare', 'Finance'].map((item) => (
-              <DropdownMenu.Item
-                key={item}
-                className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
-                onSelect={() => setIndustry(item)}
-              >
-                {item}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu.Root>
+    <section className='flex justify-center py-8'>
+      <div className='w-[90%] max-w-5xl bg-white border border-gray-200 p-8 md:p-12 flex items-center rounded-lg shadow-lg relative overflow-hidden'>
+        {/* Left Decorative Image */}
+        <div className='absolute left-4 bottom-4 hidden md:block'>
+          <Image
+            width={100}
+            height={100}
+            src='/assets/imgs/page/homepage1/bg-left-hiring.svg'
+            alt='Left Decorative Image'
+          />
+        </div>
 
-      <span className='text-gray-300 mx-4'>|</span>
+        {/* Right Decorative Image */}
+        <div className='absolute right-4 bottom-4 hidden md:block'>
+          <Image
+            width={180}
+            height={100}
+            src='/assets/imgs/page/homepage1/bg-right-hiring.svg'
+            alt='Right Decorative Image'
+          />
+        </div>
 
-      {/* Location Dropdown */}
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger className='flex items-center text-gray-600 cursor-pointer'>
-          <MapPin className='w-5 h-5 mr-2 text-gray-500' />
-          <span className='text-sm font-medium'>{location}</span>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content className='bg-white shadow-md rounded-md p-2 w-36'>
-            {['New York', 'Los Angeles', 'San Francisco'].map((item) => (
-              <DropdownMenu.Item
-                key={item}
-                className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
-                onSelect={() => setLocation(item)}
-              >
-                {item}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu.Root>
+        {/* Content */}
+        <div className='z-10 flex flex-col md:flex-row items-center w-full justify-center'>
+          {/* Text Section */}
+          <div className='flex-1 md:pr-6'>
+            <div className='text-gray-500 text-sm uppercase tracking-wide font-medium'>
+              We are
+            </div>
+            <div className='text-4xl font-extrabold text-gray-900 mt-1'>
+              <span className='text-indigo-600'>Hiring</span>
+            </div>
+            <p className='text-lg text-gray-600 mt-3'>
+              Let’s <span className='text-indigo-600 font-semibold'>Work</span>{' '}
+              Together <br />&{' '}
+              <span className='text-indigo-600 font-semibold'>Explore</span>{' '}
+              Opportunities
+            </p>
+          </div>
 
-      <span className='text-gray-300 mx-4'>|</span>
-
-      {/* Keyword Input */}
-      <input
-        type='text'
-        placeholder='Your keyword...'
-        className='border-none flex-1 px-4 py-2 text-gray-500 outline-none text-sm bg-transparent placeholder-gray-400'
-      />
-
-      {/* Search Button */}
-      <button className='bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full flex items-center font-medium text-sm'>
-        <Search className='w-5 h-5 mr-2' /> Search
-      </button>
-    </div>
+          {/* Apply Now Button */}
+          <div className='flex-shrink-0'>
+            <button
+              className='flex items-center gap-2 bg-indigo-600 text-white text-md px-6 py-3 rounded-full shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none'
+              data-bs-toggle='modal'
+              data-bs-target='#ModalApplyJobForm'
+            >
+              <Image
+                width={20}
+                height={20}
+                src='/assets/imgs/template/icons/apply.svg'
+                alt='Apply Icon'
+              />
+              Apply Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }

@@ -8,79 +8,63 @@ export default function SearchBox() {
   const [location, setLocation] = useState('Location')
 
   return (
-    <div className='flex items-center bg-white shadow-md rounded-full p-2 w-full max-w-3xl'>
+    <div className='flex items-center bg-white shadow-md rounded-full px-6 py-3 w-full max-w-3xl border border-gray-200'>
       {/* Industry Dropdown */}
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger className='flex items-center px-4 py-2 text-gray-600 cursor-pointer'>
-          <Briefcase className='w-5 h-5 mr-2' /> {industry}
+        <DropdownMenu.Trigger className='flex items-center text-gray-600 cursor-pointer'>
+          <Briefcase className='w-5 h-5 mr-2 text-gray-500' />
+          <span className='text-sm font-medium'>{industry}</span>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className='bg-white shadow-lg rounded-md p-2'>
-            <DropdownMenu.Item
-              className='p-2 hover:bg-gray-100 cursor-pointer'
-              onSelect={() => setIndustry('Technology')}
-            >
-              Technology
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              className='p-2 hover:bg-gray-100 cursor-pointer'
-              onSelect={() => setIndustry('Healthcare')}
-            >
-              Healthcare
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              className='p-2 hover:bg-gray-100 cursor-pointer'
-              onSelect={() => setIndustry('Finance')}
-            >
-              Finance
-            </DropdownMenu.Item>
+          <DropdownMenu.Content className='bg-white shadow-md rounded-md p-2 w-36'>
+            {['Technology', 'Healthcare', 'Finance'].map((item) => (
+              <DropdownMenu.Item
+                key={item}
+                className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
+                onSelect={() => setIndustry(item)}
+              >
+                {item}
+              </DropdownMenu.Item>
+            ))}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
 
-      <span className='text-gray-400 mx-2'>|</span>
+      <span className='text-gray-300 mx-4'>|</span>
 
       {/* Location Dropdown */}
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger className='flex items-center px-4 py-2 text-gray-600 cursor-pointer'>
-          <MapPin className='w-5 h-5 mr-2' /> {location}
+        <DropdownMenu.Trigger className='flex items-center text-gray-600 cursor-pointer'>
+          <MapPin className='w-5 h-5 mr-2 text-gray-500' />
+          <span className='text-sm font-medium'>{location}</span>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className='bg-white shadow-lg rounded-md p-2'>
-            <DropdownMenu.Item
-              className='p-2 hover:bg-gray-100 cursor-pointer'
-              onSelect={() => setLocation('New York')}
-            >
-              New York
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              className='p-2 hover:bg-gray-100 cursor-pointer'
-              onSelect={() => setLocation('Los Angeles')}
-            >
-              Los Angeles
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              className='p-2 hover:bg-gray-100 cursor-pointer'
-              onSelect={() => setLocation('San Francisco')}
-            >
-              San Francisco
-            </DropdownMenu.Item>
+          <DropdownMenu.Content className='bg-white shadow-md rounded-md p-2 w-36'>
+            {['New York', 'Los Angeles', 'San Francisco'].map((item) => (
+              <DropdownMenu.Item
+                key={item}
+                className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
+                onSelect={() => setLocation(item)}
+              >
+                {item}
+              </DropdownMenu.Item>
+            ))}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
 
-      <span className='text-gray-400 mx-2'>|</span>
+      <span className='text-gray-300 mx-4'>|</span>
 
       {/* Keyword Input */}
       <input
         type='text'
         placeholder='Your keyword...'
-        className='border-none focus:ring-0 flex-1 px-4 py-2 outline-none'
+        className='border-none flex-1 px-4 py-2 text-gray-500 outline-none text-sm bg-transparent placeholder-gray-400'
       />
 
       {/* Search Button */}
-      <button className='bg-blue-600 text-white px-6 py-2 rounded-full flex items-center'>
-        <Search className='w-5 h-5 mr-2' /> Search
+      <button className='bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full flex items-center font-sm text-sm'>
+        <Search className='w-3 h-3 mr-2' /> Search
       </button>
     </div>
   )

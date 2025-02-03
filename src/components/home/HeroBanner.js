@@ -1,16 +1,4 @@
-'use client'
-
-import { Search, MapPin, Briefcase } from 'lucide-react'
-
 import Image from 'next/image'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/Dropdown-Menu'
-import { Input } from '../ui/Input'
-import { Button } from '../ui/Button'
 import SearchBox from '../ui/SearchBox'
 
 export default function SectionBox() {
@@ -34,7 +22,7 @@ export default function SectionBox() {
           <SearchBox />
           {/* Popular Searches */}
           <div className='mt-6 text-gray-500 text-sm'>
-            <strong>Popular Searches:</strong>{' '}
+            <strong>Popular Searches:</strong>
             <a href='#' className='text-blue-500 hover:underline'>
               Designer
             </a>
