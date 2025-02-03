@@ -28,21 +28,26 @@ export default function HiringBanner() {
         </div>
 
         {/* Content */}
-        <div className='z-10 flex flex-col md:flex-row items-center w-full justify-center'>
+        <div className='z-10 flex flex-col md:flex-row items-center w-full justify-between px-48'>
           {/* Text Section */}
-          <div className='flex-1 md:pr-6'>
-            <div className='text-gray-500 text-sm uppercase tracking-wide font-medium'>
-              We are
+          <div className='flex'>
+            <div className='px-2'>
+              <p className='text-gray-500 text-sm uppercase tracking-wide font-medium'>
+                We are
+              </p>
+              <p className='text-4xl font-extrabold text-gray-900 mt-1'>
+                Hiring
+              </p>
             </div>
-            <div className='text-4xl font-extrabold text-gray-900 mt-1'>
-              <span className='text-indigo-600'>Hiring</span>
+            <div className='px-2'>
+              <p className='text-lg text-gray-600 mt-3'>
+                Let’s{' '}
+                <span className='text-indigo-600 font-semibold'>Work</span>{' '}
+                Together <br />&{' '}
+                <span className='text-indigo-600 font-semibold'>Explore</span>{' '}
+                Opportunities
+              </p>
             </div>
-            <p className='text-lg text-gray-600 mt-3'>
-              Let’s <span className='text-indigo-600 font-semibold'>Work</span>{' '}
-              Together <br />&{' '}
-              <span className='text-indigo-600 font-semibold'>Explore</span>{' '}
-              Opportunities
-            </p>
           </div>
 
           {/* Apply Now Button */}
