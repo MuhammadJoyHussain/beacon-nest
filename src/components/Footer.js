@@ -8,16 +8,12 @@ export default function Footer() {
         <div className='grid grid-cols-1 md:grid-cols-6 gap-6'>
           <div className='md:col-span-2'>
             <Link href='/'>
-              <Image
-                src='/assets/imgs/template/jobhub-logo.svg'
-                alt='JobBox'
-                width={150}
-                height={50}
-              />
+              <h1 className='text-4xl text-blue-400'>Beacon Nest</h1>
             </Link>
             <p className='mt-4 text-sm text-gray-600'>
-              JobBox is the heart of the design community and the best resource
-              to discover and connect with designers and jobs worldwide.
+              Beacon Nest is the heart of the design community and the best
+              resource to discover and connect with designers and jobs
+              worldwide.
             </p>
             <div className='flex space-x-4 mt-4'>
               <Link href='#' className='text-blue-600 hover:text-blue-800'>

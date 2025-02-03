@@ -11,12 +11,7 @@ export default function Header() {
         {/* Logo */}
         <div className='flex items-center'>
           <Link href='/'>
-            <Image
-              src='/assets/imgs/template/jobhub-logo.svg'
-              alt='jobBox'
-              width={139}
-              height={50}
-            />
+            <h1 className='text-4xl text-blue-400'>Beacon Nest</h1>
           </Link>
         </div>
 
