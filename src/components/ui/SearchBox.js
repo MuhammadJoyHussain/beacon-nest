@@ -8,19 +8,19 @@ export default function SearchBox() {
   const [location, setLocation] = useState('Location')
 
   return (
-    <div className='flex items-center bg-white shadow-md rounded-full px-6 py-3 w-full max-w-3xl border border-gray-200'>
+    <div className='flex flex-wrap md:flex-nowrap items-center bg-gray-100 shadow-lg rounded-xl px-4 md:px-6 py-4 w-full max-w-3xl border border-gray-300 gap-3 md:gap-5'>
       {/* Industry Dropdown */}
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger className='flex items-center text-gray-600 cursor-pointer'>
-          <Briefcase className='w-5 h-5 mr-2 text-gray-500' />
+        <DropdownMenu.Trigger className='flex items-center text-gray-700 cursor-pointer w-full md:w-auto bg-white p-2 rounded-lg shadow-sm'>
+          <Briefcase className='w-5 h-5 mr-2 text-gray-600' />
           <span className='text-sm font-medium'>{industry}</span>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className='bg-white shadow-md rounded-md p-2 w-36'>
+          <DropdownMenu.Content className='bg-white shadow-lg rounded-lg p-3 w-40'>
             {['Technology', 'Healthcare', 'Finance'].map((item) => (
               <DropdownMenu.Item
                 key={item}
-                className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
+                className='p-2 hover:bg-gray-200 cursor-pointer text-sm rounded-md'
                 onSelect={() => setIndustry(item)}
               >
                 {item}
@@ -30,20 +30,20 @@ export default function SearchBox() {
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
 
-      <span className='text-gray-300 mx-4'>|</span>
+      <span className='hidden md:block text-gray-400'>|</span>
 
       {/* Location Dropdown */}
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger className='flex items-center text-gray-600 cursor-pointer'>
-          <MapPin className='w-5 h-5 mr-2 text-gray-500' />
+        <DropdownMenu.Trigger className='flex items-center text-gray-700 cursor-pointer w-full md:w-auto bg-white p-2 rounded-lg shadow-sm'>
+          <MapPin className='w-5 h-5 mr-2 text-gray-600' />
           <span className='text-sm font-medium'>{location}</span>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className='bg-white shadow-md rounded-md p-2 w-36'>
+          <DropdownMenu.Content className='bg-white shadow-lg rounded-lg p-3 w-40'>
             {['New York', 'Los Angeles', 'San Francisco'].map((item) => (
               <DropdownMenu.Item
                 key={item}
-                className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
+                className='p-2 hover:bg-gray-200 cursor-pointer text-sm rounded-md'
                 onSelect={() => setLocation(item)}
               >
                 {item}
@@ -53,18 +53,18 @@ export default function SearchBox() {
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
 
-      <span className='text-gray-300 mx-4'>|</span>
+      <span className='hidden md:block text-gray-400'>|</span>
 
       {/* Keyword Input */}
       <input
         type='text'
-        placeholder='Your keyword...'
-        className='border-none flex-1 px-4 py-2 text-gray-500 outline-none text-sm bg-transparent placeholder-gray-400'
+        placeholder='Enter a keyword...'
+        className='border border-gray-300 rounded-lg flex-1 px-4 py-2 text-gray-700 outline-none text-sm bg-white placeholder-gray-500 w-full shadow-sm'
       />
 
       {/* Search Button */}
-      <button className='bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full flex items-center font-sm text-sm'>
-        <Search className='w-3 h-3 mr-2' /> Search
+      <button className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center text-sm w-full md:w-auto justify-center shadow-md'>
+        <Search className='w-4 h-4 mr-2' /> Search
       </button>
     </div>
   )
