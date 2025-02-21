@@ -8,12 +8,15 @@ const Candidates = () => {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const response = await fetch('https://localhost:7100/api/candidate', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        const response = await fetch(
+          'https://beacon-nest-backend.vercel.app/api/candidate',
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -30,7 +33,7 @@ const Candidates = () => {
   }, [])
 
   return (
-    <div className='flex h-screen overflow-hidden bg-gray-50'>
+    <div className='flex  overflow-hidden bg-gray-50'>
       <Sidebar />
       <Header />
 
