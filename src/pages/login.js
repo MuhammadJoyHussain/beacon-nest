@@ -7,11 +7,10 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const router = useRouter()
 
-  // 🔥 useEffect to redirect if already logged in
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      router.push('/profile') // Redirect to dashboard if logged in
+      router.push('/profile')
     }
   }, [])
 
@@ -23,7 +22,6 @@ export default function Login() {
     try {
       const { data } = await api.post('/auth/login', formData)
 
-      // Assuming API returns a JWT token
       localStorage.setItem('token', data.token)
 
       alert('Login successful! Redirecting to Dashboard...')

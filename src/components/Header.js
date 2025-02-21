@@ -34,7 +34,7 @@ export default function Header() {
             Register
           </Link>
           <Link
-            href='/signin'
+            href='/login'
             className='bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700'
           >
             Sign in
