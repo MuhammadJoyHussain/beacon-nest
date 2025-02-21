@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import api from '@/utils/api'
 import Header from '@/components/Header'
+import { Toaster, toast } from 'react-hot-toast'
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' })
@@ -12,7 +13,7 @@ export default function Login() {
     if (token) {
       router.push('/profile')
     }
-  }, [])
+  }, [router])
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -24,16 +25,17 @@ export default function Login() {
 
       localStorage.setItem('token', data.token)
 
-      alert('Login successful! Redirecting to Dashboard...')
-      router.push('/profile')
+      toast.success('Login successful! Redirecting to Profile...')
+      setTimeout(() => router.push('/profile'), 1500)
     } catch (err) {
-      alert(err.response?.data?.message || 'Login failed')
+      toast.error(err.response?.data?.message || 'Login failed')
     }
   }
 
   return (
     <>
       <Header />
+      <Toaster position='top-right' reverseOrder={false} />
       <div className='flex justify-center items-center h-screen'>
         <form
           onSubmit={handleSubmit}

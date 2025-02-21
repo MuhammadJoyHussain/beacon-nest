@@ -2,6 +2,7 @@ import { useState } from 'react'
 import api from '@/utils/api'
 import { useRouter } from 'next/router'
 import Header from '@/components/Header'
+import { Toaster, toast } from 'react-hot-toast'
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -18,16 +19,17 @@ export default function Register() {
     e.preventDefault()
     try {
       await api.post('/auth/register', formData)
-      alert('Registration successful!')
+      toast.success('Registration successful!')
       router.push('/login')
     } catch (err) {
-      alert(err.response?.data?.message || 'Registration failed')
+      toast.error(err.response?.data?.message || 'Registration failed')
     }
   }
 
   return (
     <>
       <Header />
+      <Toaster position='top-right' reverseOrder={false} />
       <div className='flex justify-center items-center h-screen'>
         <form
           onSubmit={handleSubmit}
