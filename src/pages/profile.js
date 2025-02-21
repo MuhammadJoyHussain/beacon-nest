@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import api from '@/utils/api'
 import { useRouter } from 'next/router'
 import Sidebar from '@/components/dashboard/Sidebar'
+import Header from '@/components/dashboard/Header'
 
 export default function Profile() {
   const [user, setUser] = useState(null)
@@ -31,6 +32,7 @@ export default function Profile() {
 
   return (
     <div className='flex h-screen bg-gray-100'>
+      <Header />
       <Sidebar />
       <div className='flex-grow flex items-center justify-center'>
         {user ? (
