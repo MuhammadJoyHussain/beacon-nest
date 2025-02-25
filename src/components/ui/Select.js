@@ -3,9 +3,9 @@ const Select = ({
   name,
   value,
   onChange,
-  options = [],
   required = false,
   className = '',
+  children, // Accept children
 }) => (
   <div className={`flex flex-col space-y-1 ${className}`}>
     {label && <label className='text-sm font-medium'>{label}</label>}
@@ -16,12 +16,7 @@ const Select = ({
       required={required}
       className='border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
     >
-      <option value=''>Select an option</option>
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
+      {children} {/* Render children instead of mapping options */}
     </select>
   </div>
 )

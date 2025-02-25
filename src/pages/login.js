@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 import api from '@/utils/api'
 import Header from '@/components/Header'
 import { Toaster, toast } from 'react-hot-toast'
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' })
@@ -22,9 +24,7 @@ export default function Login() {
     e.preventDefault()
     try {
       const { data } = await api.post('/auth/login', formData)
-
       localStorage.setItem('token', data.token)
-
       toast.success('Login successful! Redirecting to Profile...')
       setTimeout(() => router.push('/profile'), 1500)
     } catch (err) {
@@ -36,42 +36,40 @@ export default function Login() {
     <>
       <Header />
       <Toaster position='top-right' reverseOrder={false} />
-      <div className='flex justify-center items-center h-screen'>
-        <form
-          onSubmit={handleSubmit}
-          className='bg-white shadow-md rounded px-8 pt-6 pb-8 w-96'
+      <form
+        onSubmit={handleSubmit}
+        className='max-w-2xl mx-auto mt-20 w-full p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl shadow-2xl space-y-6'
+      >
+        <h2 className='text-3xl font-bold text-center text-blue-700'>Login</h2>
+        <Input
+          type='email'
+          name='email'
+          placeholder='Email'
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        <Input
+          type='password'
+          name='password'
+          placeholder='Password'
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <Button
+          type='submit'
+          className='w-full bg-blue-600 text-white hover:bg-blue-700'
         >
-          <h2 className='text-2xl mb-4 text-center'>Login</h2>
-          <input
-            type='email'
-            name='email'
-            placeholder='Email'
-            onChange={handleChange}
-            className='border w-full p-2 mb-4'
-            required
-          />
-          <input
-            type='password'
-            name='password'
-            placeholder='Password'
-            onChange={handleChange}
-            className='border w-full p-2 mb-4'
-            required
-          />
-          <button
-            type='submit'
-            className='bg-blue-500 text-white w-full py-2 rounded'
-          >
-            Login
-          </button>
-          <p className='text-center text-sm mt-4'>
-            Don't have an account?{' '}
-            <a href='/register' className='text-blue-500 underline'>
-              Register
-            </a>
-          </p>
-        </form>
-      </div>
+          Login
+        </Button>
+        <p className='text-center text-sm mt-2'>
+          Don't have an account?{' '}
+          <a href='/register' className='text-blue-500 underline'>
+            Register
+          </a>
+        </p>
+      </form>
     </>
   )
 }
