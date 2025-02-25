@@ -1,57 +1,51 @@
 export default function JobSection() {
   return (
-    <section className='relative mt-16 mb-16 overflow-visible px-4'>
-      <div className='container mx-auto flex flex-col-reverse lg:flex-row items-center gap-12'>
-        {/* Left Column - Image & Overlays */}
-        <div className='w-full lg:w-1/2 flex justify-center relative'>
-          <div className='relative w-full max-w-md lg:max-w-lg'>
-            <img
-              className='w-full rounded-xl shadow-lg'
-              src='/assets/imgs/page/homepage1/img1.png'
-              alt='Teamwork'
-            />
-            {/* Floating Elements */}
-            <img
-              className='absolute top-[-20px] left-[-50px] w-40 sm:w-52 lg:w-64 shadow-xs rounded-lg'
-              src='/assets/imgs/page/homepage1/img-chart.png'
-              alt='Chart'
-            />
-            <img
-              className='absolute bottom-[-100px] right-[-50px] w-40 sm:w-52 lg:w-64 shadow-xs rounded-lg'
-              src='/assets/imgs/page/homepage1/controlcard.png'
-              alt='Security Card'
-            />
-          </div>
-        </div>
-
-        {/* Right Column - Text Content */}
-        <div className='w-full lg:w-1/2 text-center lg:text-left'>
-          <span className='text-gray-400 text-lg md:text-xl'>
-            Millions Of Jobs.
-          </span>
-          <h2 className='text-3xl md:text-5xl font-bold mt-4 leading-snug'>
-            Find The One That’s <span className='text-blue-600'>Right</span> For
-            You
+    <section className='relative py-16 px-4 bg-gray-50'>
+      <div className='container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
+        {/* Left Column - Text Content */}
+        <div className='text-center lg:text-left'>
+          <h2 className='text-4xl md:text-5xl font-extrabold text-gray-800 leading-tight'>
+            Discover Your <span className='text-blue-600'>Dream Job</span> Today
           </h2>
-          <p className='mt-4 md:mt-6 text-base md:text-lg text-gray-600 leading-relaxed'>
-            Search all the open positions on the web. Get your own personalized
-            salary estimate. Read reviews on over 600,000 companies worldwide.
-            The right job is out there.
+          <p className='mt-6 text-lg text-gray-600'>
+            Browse thousands of job opportunities tailored to your skills and
+            preferences. Find the perfect role and take the next step in your
+            career.
           </p>
-          <div className='mt-6 md:mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
+          <div className='mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
             <a
               href='jobs-grid.html'
-              className='bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition text-sm md:text-base'
+              className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-base text-center'
             >
-              Search Jobs
+              Explore Jobs
             </a>
             <a
               href='page-about.html'
-              className='text-blue-600 underline hover:text-blue-800 text-sm md:text-lg'
+              className='text-blue-600 underline hover:text-blue-800 text-base text-center'
             >
               Learn More
             </a>
           </div>
+        </div>
+
+        {/* Right Column - Image */}
+        <div className='relative flex justify-center'>
+          <img
+            className='w-full max-w-md lg:max-w-lg rounded-xl object-cover'
+            src='/assets/imgs/page/homepage1/img1.png'
+            alt='Teamwork'
+          />
+          {/* Floating Elements */}
+          <img
+            className='absolute top-[-10%] sm:left-[-10] left-[-2%] w-20 sm:w-32 lg:w-40 rounded-lg'
+            src='/assets/imgs/page/homepage1/img-chart.png'
+            alt='Chart'
+          />
+          <img
+            className='absolute bottom-[-20%] sm:left-[-10] right-[-2%] w-20 sm:w-32 lg:w-40 rounded-lg'
+            src='/assets/imgs/page/homepage1/controlcard.png'
+            alt='Security Card'
+          />
         </div>
       </div>
     </section>
