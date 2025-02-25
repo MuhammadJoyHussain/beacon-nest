@@ -25,7 +25,7 @@ export default function Home() {
         <RecruitersSwiper />
         <JobListings />
         <BlogSlider />
-        <Newsletter />
+        {/* <Newsletter /> */}
         <Footer />
       </>
     </div>
