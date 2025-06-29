@@ -9,7 +9,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #ffffff;
     --foreground: #ededed;
   }
 }
@@ -18,4 +18,158 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Container Styles */
+.container {
+  max-width: 1770px;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+/* Typography */
+h1,
+h2,
+h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+p {
+  font-family: 'Inter', sans-serif;
+  color: #4b5563;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.text-blue-500 {
+  color: #3b82f6;
+}
+
+/* Grid Layout */
+.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .grid-cols-1 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Card Styles (Blog) */
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card img {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.card .category {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #2563eb;
+}
+
+.card h3 {
+  margin-top: 1rem;
+}
+
+.card p {
+  margin-top: 0.5rem;
+}
+
+.card .author-info {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.card .author-info img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.card .author-info .author-details {
+  margin-left: 0.75rem;
+}
+
+.card .author-info .author-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.card .author-info .author-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  items-center: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #2563eb;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #1d4ed8;
+}
+
+.btn:focus {
+  outline: none;
+  ring: 2px solid #3b82f6;
+}
+
+/* Section Padding */
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.pt-10 {
+  padding-top: 2.5rem;
+}
+
+/* Popular Search Link Styles */
+.popular-searches a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.popular-searches a:hover {
+  text-decoration: underline;
 }

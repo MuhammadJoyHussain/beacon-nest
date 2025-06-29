@@ -1,134 +1,87 @@
-import Image from 'next/image'
 import Link from 'next/link'
+import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
 
-export default function Footer() {
+const Footer = () => {
   return (
-    <footer className='bg-gray-100 mt-12 py-8'>
-      <div className='container mx-auto px-6'>
-        <div className='grid grid-cols-1 md:grid-cols-6 gap-6'>
-          <div className='md:col-span-2'>
-            <Link href='/'>
-              <h1 className='text-4xl text-blue-400'>Beacon Nest</h1>
-            </Link>
-            <p className='mt-4 text-sm text-gray-600'>
-              Beacon Nest is the heart of the design community and the best
-              resource to discover and connect with designers and jobs
-              worldwide.
-            </p>
-            <div className='flex space-x-4 mt-4'>
-              <Link href='#' className='text-blue-600 hover:text-blue-800'>
-                <i className='fab fa-facebook'></i>
-              </Link>
-              <Link href='#' className='text-blue-400 hover:text-blue-600'>
-                <i className='fab fa-twitter'></i>
-              </Link>
-              <Link href='#' className='text-blue-500 hover:text-blue-700'>
-                <i className='fab fa-linkedin'></i>
-              </Link>
+    <footer className='bg-gray-900 text-gray-200 py-10 px-6'>
+      <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10'>
+        {/* Branding */}
+        <div>
+          <div className='flex items-center space-x-2 mb-4'>
+            <div className='h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center rounded-full'>
+              <span className='text-white text-xl font-bold'>B</span>
             </div>
+            <span className='text-xl font-semibold text-white'>
+              Beacon Nest
+            </span>
           </div>
-          <div>
-            <h6 className='font-semibold mb-4'>Resources</h6>
-            <ul className='space-y-2'>
-              <li>
-                <Link href='#'>About us</Link>
-              </li>
-              <li>
-                <Link href='#'>Our Team</Link>
-              </li>
-              <li>
-                <Link href='#'>Products</Link>
-              </li>
-              <li>
-                <Link href='#'>Contact</Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h6 className='font-semibold mb-4'>Community</h6>
-            <ul className='space-y-2'>
-              <li>
-                <Link href='#'>Feature</Link>
-              </li>
-              <li>
-                <Link href='#'>Pricing</Link>
-              </li>
-              <li>
-                <Link href='#'>Credit</Link>
-              </li>
-              <li>
-                <Link href='#'>FAQ</Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h6 className='font-semibold mb-4'>Quick Links</h6>
-            <ul className='space-y-2'>
-              <li>
-                <Link href='#'>iOS</Link>
-              </li>
-              <li>
-                <Link href='#'>Android</Link>
-              </li>
-              <li>
-                <Link href='#'>Microsoft</Link>
-              </li>
-              <li>
-                <Link href='#'>Desktop</Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h6 className='font-semibold mb-4'>More</h6>
-            <ul className='space-y-2'>
-              <li>
-                <Link href='#'>Privacy</Link>
-              </li>
-              <li>
-                <Link href='#'>Help</Link>
-              </li>
-              <li>
-                <Link href='#'>Terms</Link>
-              </li>
-              <li>
-                <Link href='#'>FAQ</Link>
-              </li>
-            </ul>
-          </div>
-          <div className='md:col-span-2'>
-            <h6 className='font-semibold mb-4'>Download App</h6>
-            <p className='text-sm text-gray-600'>
-              Download our Apps and get extra 15% Discount on your first Order…!
-            </p>
-            <div className='flex space-x-2 mt-4'>
-              <Link href='#'>
-                <Image
-                  src='/assets/imgs/template/icons/app-store.png'
-                  alt='App Store'
-                  width={120}
-                  height={40}
-                />
-              </Link>
-              <Link href='#'>
-                <Image
-                  src='/assets/imgs/template/icons/android.png'
-                  alt='Google Play'
-                  width={120}
-                  height={40}
-                />
-              </Link>
-            </div>
-          </div>
+          <p className='text-sm text-gray-400'>
+            Empowering connections between talent and opportunity through
+            technology.
+          </p>
         </div>
-      </div>
-      <div className='border-t mt-8 py-4 text-center text-sm text-gray-600'>
-        <p>Copyright &copy; 2022. JobBox all rights reserved</p>
-        <div className='flex justify-center space-x-4 mt-2'>
-          <Link href='#'>Privacy Policy</Link>
-          <Link href='#'>Terms & Conditions</Link>
-          <Link href='#'>Security</Link>
+
+        {/* Navigation */}
+        <div className='flex flex-col space-y-2'>
+          <h3 className='text-lg font-semibold text-white mb-2'>Quick Links</h3>
+          <Link href='/' className='hover:text-blue-400 transition'>
+            Home
+          </Link>
+          <Link href='/about' className='hover:text-blue-400 transition'>
+            About Us
+          </Link>
+          <Link href='/jobs' className='hover:text-blue-400 transition'>
+            Jobs
+          </Link>
+          <Link href='/contact' className='hover:text-blue-400 transition'>
+            Contact
+          </Link>
+        </div>
+
+        {/* Social & Copyright */}
+        <div className='flex flex-col space-y-4'>
+          <h3 className='text-lg font-semibold text-white mb-2'>Follow Us</h3>
+          <div className='flex space-x-4'>
+            <a
+              href='https://facebook.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:text-blue-500'
+            >
+              <Facebook size={20} />
+            </a>
+            <a
+              href='https://twitter.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:text-blue-400'
+            >
+              <Twitter size={20} />
+            </a>
+            <a
+              href='https://instagram.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:text-pink-500'
+            >
+              <Instagram size={20} />
+            </a>
+            <a
+              href='https://linkedin.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:text-blue-300'
+            >
+              <Linkedin size={20} />
+            </a>
+          </div>
+          <p className='text-sm text-gray-500 mt-4'>
+            &copy; {new Date().getFullYear()} Beacon Nest. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
   )
 }
+
+export default Footer

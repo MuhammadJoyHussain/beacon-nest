@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import api from '@/utils/api'
 import { useRouter } from 'next/router'
+import api from '@/utils/api'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 
@@ -23,6 +23,7 @@ export default function Profile() {
         setUser(data)
       } catch (err) {
         alert('Unauthorized. Please login again.')
+        localStorage.removeItem('token')
         router.push('/login')
       }
     }
@@ -32,36 +33,67 @@ export default function Profile() {
 
   return (
     <div className='flex h-screen bg-gray-100'>
-      <Header />
       <Sidebar />
-      <div className='flex-grow flex items-center justify-center'>
-        {user ? (
-          <div className='bg-white shadow-lg rounded-xl p-8 w-96 text-center'>
-            <div className='flex flex-col items-center'>
-              <img
-                src={user.profilePic || 'https://via.placeholder.com/150'}
-                alt='Profile Picture'
-                className='w-32 h-32 rounded-full border-4 border-blue-500 mb-4'
-              />
-              <h2 className='text-2xl font-semibold text-gray-800 mb-2'>
-                {user.username}
-              </h2>
-              <p className='text-gray-600 mb-4'>{user.email}</p>
-              <button
-                onClick={() => {
-                  localStorage.removeItem('token')
-                  router.push('/login')
-                }}
-                className='bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition'
-              >
-                Logout
-              </button>
+      <div className='flex flex-col flex-grow'>
+        <Header />
+        <main className='flex-grow overflow-auto p-6'>
+          {user ? (
+            <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-10'>
+              <div className='flex flex-col items-center text-center'>
+                <img
+                  src={user.profilePic || 'https://via.placeholder.com/150'}
+                  alt='Profile Picture'
+                  className='w-32 h-32 rounded-full border-4 border-blue-500 shadow-md'
+                />
+                <h2 className='mt-4 text-3xl font-semibold text-gray-800'>
+                  {user.firstName} {user.lastName}
+                </h2>
+                <p className='text-gray-500 text-lg'>{user.email}</p>
+              </div>
+
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-700 text-base'>
+                <ProfileItem label='Username' value={user.username} />
+                <ProfileItem label='Gender' value={user.gender} />
+                <ProfileItem
+                  label='Date of Birth'
+                  value={new Date(user.dob).toLocaleDateString()}
+                />
+                <ProfileItem label='Phone' value={user.phone} />
+                <ProfileItem
+                  label='Department'
+                  value={user.department || 'N/A'}
+                />
+                <ProfileItem label='Position' value={user.position || 'N/A'} />
+                <ProfileItem
+                  label='Start Date'
+                  value={new Date(user.startDate).toLocaleDateString()}
+                />
+                <ProfileItem label='Share Code' value={user.shareCode} />
+                <div className='col-span-full'>
+                  <ProfileItem
+                    label='Address'
+                    value={`${user.street}, ${user.city}, ${user.postcode}, ${user.country}`}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        ) : (
-          <p className='text-lg text-gray-600'>Loading profile...</p>
-        )}
+          ) : (
+            <div className='text-center text-lg text-gray-600 mt-20'>
+              Loading profile...
+            </div>
+          )}
+        </main>
       </div>
+    </div>
+  )
+}
+
+// Extracted component for reusability and clean markup
+function ProfileItem({ label, value }) {
+  return (
+    <div className='bg-gray-50 p-4 rounded-xl shadow-sm'>
+      <p className='text-sm text-gray-500'>{label}</p>
+      <p className='font-medium text-gray-800'>{value}</p>
     </div>
   )
 }

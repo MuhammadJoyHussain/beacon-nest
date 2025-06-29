@@ -1,5 +1,5 @@
 const CandidateCard = ({ candidate }) => (
-  <div className='bg-white p-6 rounded-lg shadow-lg w-full sm:w-[48%] md:w-[32%] lg:w-[23%] transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl'>
+  <div className='bg-white p-6 rounded-lg shadow-lg w-full transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl'>
     <div className='flex items-center mb-4'>
       <img
         src={candidate.image}

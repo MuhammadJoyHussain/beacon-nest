@@ -33,43 +33,47 @@ export default function Login() {
   }
 
   return (
-    <>
+    <div>
       <Header />
       <Toaster position='top-right' reverseOrder={false} />
-      <form
-        onSubmit={handleSubmit}
-        className='max-w-2xl mx-auto mt-20 w-full p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl shadow-2xl space-y-6'
-      >
-        <h2 className='text-3xl font-bold text-center text-blue-700'>Login</h2>
-        <Input
-          type='email'
-          name='email'
-          placeholder='Email'
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <Input
-          type='password'
-          name='password'
-          placeholder='Password'
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <Button
-          type='submit'
-          className='w-full bg-blue-600 text-white hover:bg-blue-700'
+      <div className='pt-20 pb-10 px-10'>
+        <form
+          onSubmit={handleSubmit}
+          className='max-w-2xl mx-auto mt-20 w-full p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl shadow-2xl space-y-6'
         >
-          Login
-        </Button>
-        <p className='text-center text-sm mt-2'>
-          Don't have an account?{' '}
-          <a href='/register' className='text-blue-500 underline'>
-            Register
-          </a>
-        </p>
-      </form>
-    </>
+          <h2 className='text-3xl font-bold text-center text-blue-700'>
+            Login
+          </h2>
+          <Input
+            type='email'
+            name='email'
+            placeholder='Email'
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            type='password'
+            name='password'
+            placeholder='Password'
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <Button
+            type='submit'
+            className='w-full bg-blue-600 text-white hover:bg-blue-700'
+          >
+            Login
+          </Button>
+          <p className='text-center text-sm mt-2'>
+            Don't have an account?{' '}
+            <a href='/register' className='text-blue-500 underline'>
+              Register
+            </a>
+          </p>
+        </form>
+      </div>
+    </div>
   )
 }

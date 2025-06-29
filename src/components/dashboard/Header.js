@@ -16,22 +16,6 @@ const Header = () => {
 
       {/* Actions */}
       <div className='flex items-center space-x-4'>
-        {/* Search Input */}
-        <input
-          type='text'
-          placeholder='Search...'
-          className='hidden sm:block border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 w-64'
-        />
-
-        {/* Post Job Button */}
-        <Link
-          href='/post-job'
-          className='hidden sm:flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition'
-        >
-          <Plus size={16} />
-          <span>Post Job</span>
-        </Link>
-
         {/* Notifications */}
         <button className='relative text-gray-700 hover:text-blue-500'>
           <Bell size={24} />

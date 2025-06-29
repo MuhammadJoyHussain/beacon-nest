@@ -1,82 +1,82 @@
-import Link from 'next/link'
-import Image from 'next/image'
+'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <header className='sticky top-0 bg-white shadow-md z-50 w-full'>
-      <div className='container mx-auto flex items-center justify-between p-4'>
-        {/* Logo */}
-        <div className='flex items-center'>
-          <Link href='/'>
-            <h1 className='text-4xl text-blue-400'>Beacon Nest</h1>
-          </Link>
-        </div>
+    <nav className='bg-white shadow-md fixed w-full z-10'>
+      <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='flex justify-between items-center h-16'>
+          {/* Logo */}
+          <div className='text-xl font-bold text-blue-600'>
+            <Link href='/'>Recruitly</Link>
+          </div>
 
-        {/* Navigation */}
-        <nav className='hidden md:flex space-x-6'>
-          <Link href='/' className='hover:text-blue-500'>
-            Home
-          </Link>
-          <Link href='/jobs' className='hover:text-blue-500'>
-            Jobs
-          </Link>
-          <Link href='/contact' className='hover:text-blue-500'>
-            Contact
-          </Link>
-        </nav>
-
-        {/* Sign In & Register */}
-        <div className='hidden md:flex space-x-4 items-center'>
-          <Link href='/register' className='text-blue-600 underline '>
-            Register
-          </Link>
-          <Link
-            href='/login'
-            className='bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700'
-          >
-            Sign in
-          </Link>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className='md:hidden flex flex-col space-y-1.5'
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          <span className='w-6 h-0.5 bg-black'></span>
-          <span className='w-6 h-0.5 bg-black'></span>
-          <span className='w-6 h-0.5 bg-black'></span>
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className='md:hidden bg-white shadow-lg p-4'>
-          <nav className='flex flex-col space-y-4'>
-            <Link href='/' className='hover:text-blue-500'>
-              Home
-            </Link>
-            <Link href='/jobs' className='hover:text-blue-500'>
-              Jobs
-            </Link>
-            <Link href='/contact' className='hover:text-blue-500'>
-              Contact
-            </Link>
-            <Link href='/register' className='text-blue-600 underline'>
-              Register
+          {/* Desktop Links */}
+          <div className='hidden md:flex space-x-6 items-center'>
+            <Link href='/login' className='text-gray-700 hover:text-blue-600'>
+              Login
             </Link>
             <Link
-              href='/signin'
-              className='bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700'
+              href='/register'
+              className='text-gray-700 hover:text-blue-600'
             >
-              Sign in
+              Register
             </Link>
-          </nav>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className='md:hidden'>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className='text-gray-700 focus:outline-none'
+            >
+              <svg
+                className='w-6 h-6'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                {isOpen ? (
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M6 18L18 6M6 6l12 12'
+                  />
+                ) : (
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M4 6h16M4 12h16M4 18h16'
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Links */}
+      {isOpen && (
+        <div className='md:hidden px-4 pb-4'>
+          <Link
+            href='/login'
+            className='block py-2 text-gray-700 hover:text-blue-600'
+          >
+            Login
+          </Link>
+          <Link
+            href='/register'
+            className='block py-2 text-gray-700 hover:text-blue-600'
+          >
+            Register
+          </Link>
         </div>
       )}
-    </header>
+    </nav>
   )
 }
