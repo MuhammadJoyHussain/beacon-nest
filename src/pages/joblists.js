@@ -1,64 +1,95 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
+import api from '@/utils/api'
 
 const Joblist = () => {
-  const tasks = [
-    {
-      title: 'Full Stack Engineer',
-      start: '1 day ago',
-      progress: 80,
-      priority: 'High',
-    },
-    {
-      title: 'Frontend Developer',
-      start: '3 days ago',
-      progress: 68,
-      priority: 'Medium',
-    },
-    {
-      title: 'Backend Developer',
-      start: '4 days ago',
-      progress: 20,
-      priority: 'Low',
-    },
-    {
-      title: 'UI/UX Designer',
-      start: '5 days ago',
-      progress: 100,
-      priority: 'Completed',
-    },
-  ]
+  const [appliedJobs, setAppliedJobs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) {
+          setError('You must be logged in to view this page.')
+          setLoading(false)
+          return
+        }
+
+        const { data } = await api.get('/application/my', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        // Format data to match expected job card format
+        const jobs = data.map((app) => ({
+          title: app.job.title,
+          company: app.job.company,
+          dateApplied: new Date(app.createdAt).toLocaleDateString(),
+          status: app.status,
+        }))
+
+        setAppliedJobs(jobs)
+      } catch (err) {
+        console.error(err)
+        setError('Failed to load applications.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchApplications()
+  }, [])
 
   return (
-    <div className='flex flex-col h-screen'>
-      {/* Header and Sidebar */}
-      <Header />
+    <div className='flex h-screen bg-gray-100'>
       <Sidebar />
+      <div className='flex flex-col flex-grow'>
+        <Header />
+        <main className='flex-grow overflow-auto p-6 pt-24'>
+          <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
+            <h2 className='text-3xl font-bold text-green-800 text-center'>
+              My Applications
+            </h2>
 
-      {/* Main Content */}
-      <div className='ml-64 p-6 pt-24 bg-gray-50 h-screen overflow-y-auto'>
-        <h1 className='text-2xl font-bold'>My Tasks</h1>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6'>
-          {tasks.map((task, index) => (
-            <div key={index} className='bg-white shadow-md p-4 rounded-lg'>
-              <h3 className='font-semibold text-lg'>{task.title}</h3>
-              <p className='text-gray-500 text-sm'>Start: {task.start}</p>
-              <p className='text-gray-700'>Complete: {task.progress}%</p>
-              <span
-                className={`inline-block mt-2 px-3 py-1 text-sm rounded bg-${
-                  task.priority === 'High'
-                    ? 'red'
-                    : task.priority === 'Medium'
-                    ? 'yellow'
-                    : 'green'
-                }-500 text-white`}
-              >
-                {task.priority}
-              </span>
-            </div>
-          ))}
-        </div>
+            {loading ? (
+              <div className='text-center text-gray-500 text-lg py-10'>
+                Loading...
+              </div>
+            ) : error ? (
+              <div className='text-center text-red-500 text-lg py-10'>
+                {error}
+              </div>
+            ) : appliedJobs.length === 0 ? (
+              <div className='text-center text-gray-500 text-lg py-10'>
+                You haven’t applied for any jobs yet.
+              </div>
+            ) : (
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                {appliedJobs.map((job, index) => (
+                  <div
+                    key={index}
+                    className='bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition'
+                  >
+                    <h3 className='text-xl font-semibold text-green-700 mb-1'>
+                      {job.title}
+                    </h3>
+                    <p className='text-gray-700 mb-1'>{job.company}</p>
+                    <p className='text-sm text-gray-500'>
+                      Applied: {job.dateApplied}
+                    </p>
+                    <span className='inline-block mt-3 px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium'>
+                      {job.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
       </div>
     </div>
   )

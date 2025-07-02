@@ -5,49 +5,61 @@ import Header from '@/components/Header'
 import { Toaster, toast } from 'react-hot-toast'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
+import Footer from '@/components/Footer'
+import Link from 'next/link'
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const router = useRouter()
+  const { redirect } = router.query // 👈 capture the redirect param
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      router.push('/profile')
+      // Optional: You may want to check if the redirect is available here too
+      router.push(redirect || '/profile')
     }
-  }, [router])
+  }, [router, redirect])
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: name === 'email' ? value.toLowerCase() : value,
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       const { data } = await api.post('/auth/login', formData)
+
       localStorage.setItem('token', data.token)
-      toast.success('Login successful! Redirecting to Profile...')
-      setTimeout(() => router.push('/profile'), 1500)
+      toast.success('Login successful! Redirecting...')
+      setTimeout(() => {
+        router.push(redirect || '/profile') // 👈 use redirect if it exists
+      }, 1500)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed')
     }
   }
 
   return (
-    <div>
+    <div className='min-h-screen bg-green-50'>
       <Header />
       <Toaster position='top-right' reverseOrder={false} />
-      <div className='pt-20 pb-10 px-10'>
+      <div className='pt-20 pb-16 px-6 text-black'>
         <form
           onSubmit={handleSubmit}
-          className='max-w-2xl mx-auto mt-20 w-full p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl shadow-2xl space-y-6'
+          className='max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-10 space-y-8'
         >
-          <h2 className='text-3xl font-bold text-center text-blue-700'>
+          <h2 className='text-3xl font-extrabold text-center text-green-800'>
             Login
           </h2>
           <Input
             type='email'
             name='email'
-            placeholder='Email'
+            placeholder='Email*'
             value={formData.email}
             onChange={handleChange}
             required
@@ -55,25 +67,29 @@ export default function Login() {
           <Input
             type='password'
             name='password'
-            placeholder='Password'
+            placeholder='Password*'
             value={formData.password}
             onChange={handleChange}
             required
           />
           <Button
             type='submit'
-            className='w-full bg-blue-600 text-white hover:bg-blue-700'
+            className='w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition'
           >
             Login
           </Button>
-          <p className='text-center text-sm mt-2'>
+          <p className='text-center text-sm text-green-800'>
             Don't have an account?{' '}
-            <a href='/register' className='text-blue-500 underline'>
+            <Link
+              href={`/register${redirect ? `?redirect=${redirect}` : ''}`}
+              className='text-green-600 underline hover:text-green-700'
+            >
               Register
-            </a>
+            </Link>
           </p>
         </form>
       </div>
+      <Footer />
     </div>
   )
 }

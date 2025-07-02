@@ -5,38 +5,49 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import SelectItem from '@/components/ui/SelectItem'
 import api from '@/utils/api'
-import axios from 'axios'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
+import Footer from '@/components/Footer'
 
 const Register = () => {
-  const [file, setFile] = useState(null)
-  const [extractedData, setExtractedData] = useState(null)
-  const { register, handleUploadSubmit, reset } = useForm()
-  const router = useRouter()
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    dob: '',
-    gender: '',
-    email: '',
-    phone: '',
-    street: '',
-    city: '',
-    postcode: '',
-    country: '',
-    department: '',
-    position: '',
-    startDate: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
-    shareCode: '',
-    terms: false,
-    gdpr: false,
+  const { register, handleSubmit, reset, setValue, watch } = useForm({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      dob: '',
+      gender: '',
+      email: '',
+      phone: '',
+      street: '',
+      city: '',
+      postcode: '',
+      country: '',
+      department: '',
+      position: '',
+      startDate: '',
+      endDate: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+      shareCode: '',
+      terms: false,
+      gdpr: false,
+      employeeExperience: {
+        position: '',
+        company: '',
+        startDate: '',
+        endDate: '',
+        city: '',
+        country: '',
+      },
+    },
   })
+
+  const router = useRouter()
+  const [file, setFile] = useState(null)
+  const formData = watch()
 
   const genders = ['Male', 'Female', 'Other']
   const countries = [
@@ -46,114 +57,129 @@ const Register = () => {
     'Australia',
     'Germany',
   ]
-  const departments = ['HR', 'IT', 'Sales', 'Marketing', 'Finance']
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value })
+    if (name.startsWith('employeeExperience.')) {
+      const field = name.split('.')[1]
+      setValue(`employeeExperience.${field}`, value)
+    } else {
+      setValue(name, type === 'checkbox' ? checked : value)
+    }
   }
 
-  const handleFileChange = (e) => setFile(e.target.files[0])
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0]
+    setFile(selectedFile)
 
-  const handleUpload = async () => {
-    if (!file) return alert('Please select a PDF file first')
+    if (!selectedFile) return toast.error('Please select a PDF file first')
+
     const formData = new FormData()
-    formData.append('pdf', file)
+    formData.append('pdf', selectedFile)
 
     try {
-      const res = await axios.post('http://localhost:5000/api/upload', formData)
-      console.log(res.data)
+      const res = await api.post('/upload', formData)
+      toast.success('PDF uploaded, form data extracted!')
 
-      setExtractedData(res.data)
-      reset(res.data) // update form with extracted values
+      const data = res.data
+      console.log(data)
+
+      if (data.employeeExperience && data.employeeExperience.length > 0) {
+        const exp = data.employeeExperience[0]
+        setValue('employeeExperience.position', exp.position || '')
+        setValue('employeeExperience.company', exp.company || '')
+        setValue('employeeExperience.startDate', exp.startDate || '')
+        setValue(
+          'employeeExperience.endDate',
+          exp.endDate?.includes('undefined') ? '' : exp.endDate || ''
+        )
+        setValue('employeeExperience.city', exp.city || '')
+        setValue('employeeExperience.country', exp.country || '')
+      }
+
+      reset({ ...formData, ...data })
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Error uploading PDF')
+      toast.error(error.response?.data?.message || 'Error uploading PDF')
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!formData.terms || !formData.gdpr) {
-      alert('Please agree to Terms & Conditions and GDPR policy.')
+  const onSubmit = async (data) => {
+    if (!data.terms || !data.gdpr) {
+      toast.error('Please agree to Terms & Conditions and GDPR policy.')
       return
     }
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match.')
+    if (data.password !== data.confirmPassword) {
+      toast.error('Passwords do not match.')
       return
     }
-    console.log('Form Submitted:', formData)
+
     try {
-      const { data } = await api.post('auth/register', formData)
-      localStorage.setItem('token', data.token)
-      toast.success('Login successful! Redirecting to Profile...')
+      const { data: resData } = await api.post('auth/register', data)
+      localStorage.setItem('token', resData.token)
+      toast.success('Registration successful! Redirecting...')
       setTimeout(() => router.push('/profile'), 1500)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed')
+      toast.error(err.response?.data?.message || 'Registration failed')
     }
   }
 
   return (
-    <div>
+    <div className='min-h-screen bg-green-50'>
       <Header />
-      <div className='pt-20 pb-10'>
+      <div className='pt-20 pb-16 px-6 text-black'>
         <form
-          onSubmit={handleSubmit}
-          className='max-w-3xl mx-auto p-8 bg-gradient-to-r text-black from-blue-50 to-blue-100 rounded-3xl shadow-2xl space-y-8'
+          onSubmit={handleSubmit(onSubmit)}
+          className='max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-10 space-y-10'
         >
-          <h2 className='text-3xl font-bold text-center text-blue-700'>
+          <h2 className='text-3xl font-extrabold text-green-800 text-center'>
             Employee Registration
           </h2>
 
-          {/* Personal Details */}
-          <div className='space-y-4'>
-            <h3 className='text-2xl font-semibold text-blue-600'>
-              Personal Details
-            </h3>
-            <h2>PDF Upload & Extract</h2>
-
-            {/* PDF Upload Section */}
+          {/* Upload */}
+          <section className='space-y-2'>
+            <h3 className='text-2xl font-semibold text-green-700'>Upload CV</h3>
             <input
               type='file'
               accept='application/pdf'
               onChange={handleFileChange}
+              className='border border-green-300 rounded px-3 py-2 bg-green-50 text-green-900'
             />
-            <button onClick={handleUpload} style={{ marginLeft: '1rem' }}>
-              Upload PDF
-            </button>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          </section>
+
+          {/* Personal Details */}
+          <section className='space-y-6'>
+            <h3 className='text-2xl font-semibold text-green-700'>
+              Personal Details
+            </h3>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
                 name='firstName'
                 placeholder='First Name*'
+                register={register}
                 value={formData.firstName}
                 onChange={handleChange}
-                register={register}
-                required
               />
               <Input
                 name='lastName'
                 placeholder='Last Name*'
+                register={register}
                 value={formData.lastName}
                 onChange={handleChange}
-                register={register}
-                required
               />
-            </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <Input
                 name='dob'
                 type='date'
                 placeholder='Date of Birth*'
+                register={register}
                 value={formData.dob}
                 onChange={handleChange}
-                required
               />
-
               <Select
                 name='gender'
+                {...register('gender')}
                 value={formData.gender}
                 onChange={handleChange}
-                required
               >
                 <option value=''>Select Gender*</option>
                 {genders.map((gen) => (
@@ -162,75 +188,71 @@ const Register = () => {
                   </SelectItem>
                 ))}
               </Select>
+              <Input
+                name='shareCode'
+                placeholder='Share Code*'
+                {...register('shareCode')}
+                value={formData.shareCode}
+                onChange={handleChange}
+              />
             </div>
-            <Input
-              name='shareCode'
-              placeholder='Share Code*'
-              value={formData.shareCode}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          </section>
 
-          {/* Contact Information */}
-          <div className='space-y-4'>
-            <h3 className='text-2xl font-semibold text-blue-600'>
+          {/* Contact Info */}
+          <section className='space-y-6'>
+            <h3 className='text-2xl font-semibold text-green-700'>
               Contact Information
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
                 name='email'
                 type='email'
                 placeholder='Email*'
+                register={register}
                 value={formData.email}
                 onChange={handleChange}
-                register={register}
-                required
               />
               <Input
                 name='phone'
                 placeholder='Phone Number*'
+                register={register}
                 value={formData.phone}
                 onChange={handleChange}
-                register={register}
-                required
               />
             </div>
-          </div>
+          </section>
 
           {/* Address */}
-          <div className='space-y-4'>
-            <h3 className='text-2xl font-semibold text-blue-600'>Address</h3>
+          <section className='space-y-6'>
+            <h3 className='text-2xl font-semibold text-green-700'>Address</h3>
             <Input
               name='street'
               placeholder='Street Address*'
+              register={register}
               value={formData.street}
               onChange={handleChange}
-              register={register}
-              required
             />
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
                 name='city'
                 placeholder='City*'
+                register={register}
                 value={formData.city}
                 onChange={handleChange}
-                register={register}
-                required
               />
               <Input
                 name='postcode'
                 placeholder='Postcode*'
+                register={register}
                 value={formData.postcode}
                 onChange={handleChange}
-                required
               />
             </div>
             <Select
               name='country'
+              register={register}
               value={formData.country}
               onChange={handleChange}
-              required
             >
               <option value=''>Select Country*</option>
               {countries.map((country) => (
@@ -239,112 +261,136 @@ const Register = () => {
                 </SelectItem>
               ))}
             </Select>
-          </div>
+          </section>
 
-          {/* Employment Details */}
-          <div className='space-y-4'>
-            <h3 className='text-2xl font-semibold text-blue-600'>
+          {/* Experience */}
+          <section className='space-y-6'>
+            <h3 className='text-2xl font-semibold text-green-700'>
               Employee Experience
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
-                name='department'
-                placeholder='Department*'
-                value={formData.department}
-                onChange={handleChange}
+                name='employeeExperience.position'
+                placeholder='Position*'
                 register={register}
-                required
+                value={formData.employeeExperience?.position || ''}
+                onChange={handleChange}
               />
               <Input
-                name='position'
-                placeholder='Position*'
-                value={formData.position}
-                onChange={handleChange}
+                name='employeeExperience.company'
+                placeholder='Company*'
                 register={register}
-                required
+                value={formData.employeeExperience?.company || ''}
+                onChange={handleChange}
               />
             </div>
-            <Input
-              name='startDate'
-              type='date'
-              placeholder='Start Date*'
-              value={formData.startDate}
-              onChange={handleChange}
-              register={register}
-              required
-            />
-            <Input
-              name='endDate'
-              type='date'
-              placeholder='End Date*'
-              value={formData.endDate}
-              onChange={handleChange}
-              register={register}
-              required
-            />
-          </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <Input
+                name='employeeExperience.startDate'
+                type='date'
+                placeholder='Start Date*'
+                register={register}
+                value={formData.employeeExperience?.startDate || ''}
+                onChange={handleChange}
+              />
+              <Input
+                name='employeeExperience.endDate'
+                type='date'
+                placeholder='End Date'
+                register={register}
+                value={formData.employeeExperience?.endDate || ''}
+                onChange={handleChange}
+              />
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <Input
+                name='employeeExperience.city'
+                placeholder='City'
+                register={register}
+                value={formData.employeeExperience?.city || ''}
+                onChange={handleChange}
+              />
+              <Input
+                name='employeeExperience.country'
+                placeholder='Country'
+                register={register}
+                value={formData.employeeExperience?.country || ''}
+                onChange={handleChange}
+              />
+            </div>
+          </section>
 
           {/* Account Setup */}
-          <div className='space-y-4'>
-            <h3 className='text-2xl font-semibold text-blue-600'>
+          <section className='space-y-6'>
+            <h3 className='text-2xl font-semibold text-green-700'>
               Account Setup
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
                 name='username'
                 placeholder='Username*'
+                {...register('username')}
                 value={formData.username}
                 onChange={handleChange}
-                required
               />
               <Input
                 name='password'
                 type='password'
                 placeholder='Password*'
+                {...register('password')}
                 value={formData.password}
                 onChange={handleChange}
-                required
               />
             </div>
             <Input
               name='confirmPassword'
               type='password'
               placeholder='Confirm Password*'
+              {...register('confirmPassword')}
               value={formData.confirmPassword}
               onChange={handleChange}
-              required
             />
-          </div>
+          </section>
 
           {/* Consent */}
-          <div className='space-y-2'>
-            <label className='flex items-center space-x-2'>
+          <section className='space-y-3'>
+            <label className='flex items-center space-x-3'>
               <Checkbox
                 name='terms'
                 checked={formData.terms}
                 onChange={handleChange}
               />
-              <span>I agree to the Terms & Conditions*</span>
+              <span className='text-green-900'>
+                I agree to the{' '}
+                <a href='/terms' className='underline'>
+                  Terms & Conditions*
+                </a>
+              </span>
             </label>
-            <label className='flex items-center space-x-2'>
+            <label className='flex items-center space-x-3'>
               <Checkbox
                 name='gdpr'
                 checked={formData.gdpr}
                 onChange={handleChange}
               />
-              <span>I agree to the GDPR Policy*</span>
+              <span className='text-green-900'>
+                I agree to the{' '}
+                <a href='/gdpr' className='underline'>
+                  GDPR Policy*
+                </a>
+              </span>
             </label>
-          </div>
+          </section>
 
-          {/* Submit */}
           <Button
             type='submit'
-            className='w-full bg-blue-600 text-white hover:bg-blue-700'
+            className='w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition'
           >
             Register
           </Button>
         </form>
       </div>
+      <Footer />
     </div>
   )
 }

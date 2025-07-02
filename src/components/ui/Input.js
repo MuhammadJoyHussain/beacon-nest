@@ -4,6 +4,7 @@ const Input = ({
   type = 'text',
   name,
   placeholder,
+  onChange,
   required = false,
   className = '',
   register,
@@ -15,7 +16,8 @@ const Input = ({
       name={name}
       placeholder={placeholder}
       required={required}
-      className='border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+      onChange={onChange}
+      className='border text-black rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500'
       {...(register ? register(name) : {})}
     />
   </div>

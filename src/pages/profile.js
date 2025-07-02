@@ -36,15 +36,22 @@ export default function Profile() {
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <Header />
-        <main className='flex-grow overflow-auto p-6'>
+        <main className='flex-grow overflow-auto p-6 pt-24'>
           {user ? (
             <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-10'>
               <div className='flex flex-col items-center text-center'>
-                <img
-                  src={user.profilePic || 'https://via.placeholder.com/150'}
-                  alt='Profile Picture'
-                  className='w-32 h-32 rounded-full border-4 border-blue-500 shadow-md'
-                />
+                {user.profilePic ? (
+                  <img
+                    src={user.profilePic}
+                    alt='Profile Picture'
+                    className='w-32 h-32 rounded-full border-4 border-blue-500 shadow-md object-cover'
+                  />
+                ) : (
+                  <div className='w-32 h-32 rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold border-4 border-blue-500 shadow-md'>
+                    {getInitials(user.firstName, user.lastName)}
+                  </div>
+                )}
+
                 <h2 className='mt-4 text-3xl font-semibold text-gray-800'>
                   {user.firstName} {user.lastName}
                 </h2>
@@ -88,7 +95,7 @@ export default function Profile() {
   )
 }
 
-// Extracted component for reusability and clean markup
+// Helper component
 function ProfileItem({ label, value }) {
   return (
     <div className='bg-gray-50 p-4 rounded-xl shadow-sm'>
@@ -96,4 +103,11 @@ function ProfileItem({ label, value }) {
       <p className='font-medium text-gray-800'>{value}</p>
     </div>
   )
+}
+
+// Helper to get initials
+function getInitials(firstName, lastName) {
+  const first = firstName?.[0]?.toUpperCase() || ''
+  const last = lastName?.[0]?.toUpperCase() || ''
+  return first + last
 }

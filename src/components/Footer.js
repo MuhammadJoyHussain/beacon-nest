@@ -30,8 +30,8 @@ const Footer = () => {
           <Link href='/about' className='hover:text-blue-400 transition'>
             About Us
           </Link>
-          <Link href='/jobs' className='hover:text-blue-400 transition'>
-            Jobs
+          <Link href='/career' className='hover:text-blue-400 transition'>
+            Career
           </Link>
           <Link href='/contact' className='hover:text-blue-400 transition'>
             Contact
