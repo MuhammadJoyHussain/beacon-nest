@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { toast, Toaster } from 'react-hot-toast'
+import LoadingScreen from '@/components/loading'
 
 export default function ApplyJob() {
   const router = useRouter()
@@ -75,7 +76,7 @@ export default function ApplyJob() {
     }
   }
 
-  if (loading) return <div className='p-20 text-center'>Loading...</div>
+  if (loading) return <LoadingScreen />
   if (!user) return null
 
   return (

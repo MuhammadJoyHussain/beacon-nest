@@ -24,24 +24,18 @@ const Register = () => {
       city: '',
       postcode: '',
       country: '',
-      department: '',
       position: '',
+      company: '',
       startDate: '',
       endDate: '',
+      expCity: '',
+      expCountry: '',
       username: '',
       password: '',
       confirmPassword: '',
       shareCode: '',
       terms: false,
       gdpr: false,
-      employeeExperience: {
-        position: '',
-        company: '',
-        startDate: '',
-        endDate: '',
-        city: '',
-        country: '',
-      },
     },
   })
 
@@ -60,12 +54,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    if (name.startsWith('employeeExperience.')) {
-      const field = name.split('.')[1]
-      setValue(`employeeExperience.${field}`, value)
-    } else {
-      setValue(name, type === 'checkbox' ? checked : value)
-    }
+    setValue(name, type === 'checkbox' ? checked : value)
   }
 
   const handleFileChange = async (e) => {
@@ -74,11 +63,11 @@ const Register = () => {
 
     if (!selectedFile) return toast.error('Please select a PDF file first')
 
-    const formData = new FormData()
-    formData.append('pdf', selectedFile)
+    const formDataUpload = new FormData()
+    formDataUpload.append('pdf', selectedFile)
 
     try {
-      const res = await api.post('/upload', formData)
+      const res = await api.post('/upload', formDataUpload)
       toast.success('PDF uploaded, form data extracted!')
 
       const data = res.data
@@ -86,15 +75,15 @@ const Register = () => {
 
       if (data.employeeExperience && data.employeeExperience.length > 0) {
         const exp = data.employeeExperience[0]
-        setValue('employeeExperience.position', exp.position || '')
-        setValue('employeeExperience.company', exp.company || '')
-        setValue('employeeExperience.startDate', exp.startDate || '')
+        setValue('position', exp.position || '')
+        setValue('company', exp.company || '')
+        setValue('startDate', exp.startDate || '')
         setValue(
-          'employeeExperience.endDate',
+          'endDate',
           exp.endDate?.includes('undefined') ? '' : exp.endDate || ''
         )
-        setValue('employeeExperience.city', exp.city || '')
-        setValue('employeeExperience.country', exp.country || '')
+        setValue('expCity', exp.city || '')
+        setValue('expCountry', exp.country || '')
       }
 
       reset({ ...formData, ...data })
@@ -116,6 +105,8 @@ const Register = () => {
 
     try {
       const { data: resData } = await api.post('auth/register', data)
+      console.log(data)
+
       localStorage.setItem('token', resData.token)
       toast.success('Registration successful! Redirecting...')
       setTimeout(() => router.push('/profile'), 1500)
@@ -270,51 +261,51 @@ const Register = () => {
             </h3>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
-                name='employeeExperience.position'
+                name='position'
                 placeholder='Position*'
                 register={register}
-                value={formData.employeeExperience?.position || ''}
+                value={formData.position}
                 onChange={handleChange}
               />
               <Input
-                name='employeeExperience.company'
+                name='company'
                 placeholder='Company*'
                 register={register}
-                value={formData.employeeExperience?.company || ''}
+                value={formData.company}
                 onChange={handleChange}
               />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
-                name='employeeExperience.startDate'
+                name='startDate'
                 type='date'
                 placeholder='Start Date*'
                 register={register}
-                value={formData.employeeExperience?.startDate || ''}
+                value={formData.startDate}
                 onChange={handleChange}
               />
               <Input
-                name='employeeExperience.endDate'
+                name='endDate'
                 type='date'
                 placeholder='End Date'
                 register={register}
-                value={formData.employeeExperience?.endDate || ''}
+                value={formData.endDate}
                 onChange={handleChange}
               />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <Input
-                name='employeeExperience.city'
+                name='expCity'
                 placeholder='City'
                 register={register}
-                value={formData.employeeExperience?.city || ''}
+                value={formData.expCity}
                 onChange={handleChange}
               />
               <Input
-                name='employeeExperience.country'
+                name='expCountry'
                 placeholder='Country'
                 register={register}
-                value={formData.employeeExperience?.country || ''}
+                value={formData.expCountry}
                 onChange={handleChange}
               />
             </div>

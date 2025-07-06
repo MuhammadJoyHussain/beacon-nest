@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 import api from '@/utils/api'
+import dynamic from 'next/dynamic'
 
 const Joblist = () => {
   const [appliedJobs, setAppliedJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const LoadingScreen = dynamic(() => import('@/components/Loading'), {
+    ssr: false,
+  })
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -44,6 +49,10 @@ const Joblist = () => {
     fetchApplications()
   }, [])
 
+  if (loading) {
+    return <LoadingScreen />
+  }
+
   return (
     <div className='flex h-screen bg-gray-100'>
       <Sidebar />
@@ -55,15 +64,7 @@ const Joblist = () => {
               My Applications
             </h2>
 
-            {loading ? (
-              <div className='text-center text-gray-500 text-lg py-10'>
-                Loading...
-              </div>
-            ) : error ? (
-              <div className='text-center text-red-500 text-lg py-10'>
-                {error}
-              </div>
-            ) : appliedJobs.length === 0 ? (
+            {appliedJobs.length === 0 ? (
               <div className='text-center text-gray-500 text-lg py-10'>
                 You haven’t applied for any jobs yet.
               </div>

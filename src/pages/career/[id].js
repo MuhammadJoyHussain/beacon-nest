@@ -4,7 +4,7 @@ import api from '@/utils/api'
 import React, { useState, useEffect } from 'react'
 import Footer from '@/components/Footer'
 import Button from '@/components/ui/Button'
-import Link from 'next/link'
+import dynamic from 'next/dynamic'
 
 const VacancyDetail = () => {
   const router = useRouter()
@@ -12,6 +12,10 @@ const VacancyDetail = () => {
 
   const [vacancy, setVacancy] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  const LoadingScreen = dynamic(() => import('@/components/Loading'), {
+    ssr: false,
+  })
 
   useEffect(() => {
     if (!router.isReady || !id) return
@@ -29,11 +33,7 @@ const VacancyDetail = () => {
   }, [router.isReady, id])
 
   if (loading) {
-    return (
-      <div className='min-h-screen bg-green-50 flex items-center justify-center'>
-        <p className='text-lg text-gray-600'>Loading...</p>
-      </div>
-    )
+    return <LoadingScreen />
   }
 
   if (!vacancy) {

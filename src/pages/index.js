@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Briefcase, Globe, Users } from 'lucide-react'
-import Header from '@/components/Header'
+import Header from '@/components/dashboard/Header'
 import Footer from '@/components/Footer'
 import api from '@/utils/api'
 
@@ -48,7 +48,7 @@ const HomePage = () => {
               Connect with top employers and land your ideal role today.
             </p>
             <Link
-              href='/vacancies'
+              href='/career'
               className='inline-block bg-white text-green-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition'
             >
               Browse Jobs

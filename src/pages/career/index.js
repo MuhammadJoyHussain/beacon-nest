@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import api from '@/utils/api'
+import dynamic from 'next/dynamic'
 
 const Vacancies = () => {
   const [search, setSearch] = useState('')
@@ -12,6 +13,10 @@ const Vacancies = () => {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+
+  const LoadingScreen = dynamic(() => import('@/components/Loading'), {
+    ssr: false,
+  })
 
   const fetchVacancies = async () => {
     setLoading(true)
@@ -48,6 +53,10 @@ const Vacancies = () => {
 
   const handleNext = () => {
     if (page < totalPages) setPage((prev) => prev + 1)
+  }
+
+  if (loading) {
+    return <LoadingScreen />
   }
 
   return (
@@ -108,11 +117,7 @@ const Vacancies = () => {
         </div>
 
         {/* Loader / Empty / Jobs */}
-        {loading ? (
-          <div className='text-center text-gray-500 text-lg font-medium py-10'>
-            Loading jobs...
-          </div>
-        ) : vacancies.length === 0 ? (
+        {vacancies.length === 0 ? (
           <p className='text-center text-gray-500 text-lg py-10'>
             No vacancies found.
           </p>

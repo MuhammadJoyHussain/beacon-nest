@@ -1,23 +1,45 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { Menu as HMenu } from '@headlessui/react'
 import { useRouter } from 'next/router'
 
+function parseJwt(token) {
+  try {
+    const base64Payload = token.split('.')[1]
+    const payload = atob(base64Payload)
+    return JSON.parse(payload)
+  } catch (e) {
+    console.error('Failed to parse JWT', e)
+    return null
+  }
+}
+
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [role, setRole] = useState(null)
   const router = useRouter()
 
-  const menuItems = [
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      const decoded = parseJwt(token)
+      setRole(decoded?.role || 'user') // default to user if no role
+    }
+  }, [])
+
+  const userMenuItems = [
     { href: '/profile', label: 'My Profiles', icon: 'profiles.svg' },
-    // { href: '/dashboard', label: 'Dashboard', icon: 'dashboard.svg' },
-    // { href: '/candidates', label: 'Candidates', icon: 'candidates.svg' },
-    // { href: '/recruiters', label: 'Recruiters', icon: 'recruiters.svg' },
     { href: '/joblists', label: 'My Jobs', icon: 'jobs.svg' },
-    // { href: '/tasks', label: 'Tasks List', icon: 'tasks.svg' },
+    { href: '/recommendation', label: 'Job Recommanded', icon: 'jobs.svg' },
     { href: '/updateProfile', label: 'Update Profile', icon: 'cv-manage.svg' },
-    // { href: '/settings', label: 'Setting', icon: 'settings.svg' },
-    // { href: '/auth', label: 'Authentication', icon: 'authentication.svg' },
+  ]
+
+  const adminMenuItems = [
+    { href: '/admin/dashboard', label: 'Dashboard', icon: 'dashboard.svg' },
+    { href: '/admin/users', label: 'Manage Users', icon: 'profiles.svg' },
+    { href: '/admin/jobs', label: 'Manage Jobs', icon: 'jobs.svg' },
+    { href: '/admin/jobs/post', label: 'Post Job', icon: 'jobs.svg' },
   ]
 
   const handleLogout = () => {
@@ -27,8 +49,10 @@ const Sidebar = () => {
 
   const toggleSidebar = () => setIsOpen(!isOpen)
 
+  const menuItems = role === 'admin' ? adminMenuItems : userMenuItems
+
   return (
-    <>
+    <div className='pt-16'>
       {/* Mobile Toggle Button */}
       <button
         onClick={toggleSidebar}
@@ -52,12 +76,6 @@ const Sidebar = () => {
         lg:translate-x-0 lg:static lg:shadow-none lg:bg-gradient-to-br from-green-600 to-green-800`}
       >
         <div className='h-full p-6 overflow-y-auto lg:text-white'>
-          {/* Brand/Logo */}
-          <div className='mb-10 text-center font-bold text-2xl text-green-700 lg:text-white'>
-            <span className='hidden lg:inline'>RecruitPro</span>
-          </div>
-
-          {/* Menu */}
           <HMenu as='nav' className='space-y-2'>
             {menuItems.map(({ href, label, icon }) => {
               const isActive = router.pathname === href
@@ -114,7 +132,7 @@ const Sidebar = () => {
           </HMenu>
         </div>
       </aside>
-    </>
+    </div>
   )
 }
 
