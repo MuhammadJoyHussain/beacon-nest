@@ -36,7 +36,7 @@ export default function Login() {
       localStorage.setItem('token', data.token)
       toast.success('Login successful! Redirecting...')
       setTimeout(() => {
-        router.push(redirect || '/profile')
+        router.push(redirect || '/applicant/profile')
       }, 1500)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed')
