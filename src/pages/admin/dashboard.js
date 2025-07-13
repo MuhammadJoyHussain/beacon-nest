@@ -14,7 +14,12 @@ import LoadingScreen from '@/components/Loading'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 
-const StatCard = ({ title, value, icon: Icon, color = 'text-green-700' }) => (
+const StatCard = ({
+  title,
+  value,
+  icon: Icon,
+  color = 'text-foundation-primary',
+}) => (
   <motion.div
     whileHover={{ scale: 1.02 }}
     className='bg-white shadow-md rounded-2xl p-6 flex items-center space-x-4'
@@ -65,7 +70,9 @@ export default function AdminDashboard() {
       <div className='flex flex-col flex-grow'>
         <Header />
         <main className='flex-grow overflow-auto p-6 pt-24 space-y-10'>
-          <h1 className='text-3xl font-bold text-green-800'>Admin Dashboard</h1>
+          <h1 className='text-3xl font-bold text-foundation-primary'>
+            Admin Dashboard
+          </h1>
 
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
             <StatCard

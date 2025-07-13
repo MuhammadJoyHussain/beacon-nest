@@ -27,11 +27,10 @@ export default function AllJobsPage() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     const user = parseJwt(token)
-    console.log(user.role)
 
     if (!user || user.role !== 'admin') {
       toast.error('Unauthorized: Admins only')
-      router.push('/login') // or homepage
+      router.push('/login')
       return
     }
 
@@ -53,18 +52,18 @@ export default function AllJobsPage() {
   if (loading) return <LoadingScreen />
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen bg-foundation-background'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <Header />
-        <main className='pt-20 pb-16 px-4 sm:px-8 max-w-6xl mx-auto w-full text-green-900 overflow-auto'>
+        <main className='pt-20 pb-16 px-4 sm:px-8 max-w-6xl mx-auto w-full text-foundation-primary overflow-auto'>
           <h1 className='text-3xl font-bold text-center mb-10'>
             All Job Posts
           </h1>
 
           <div className='overflow-x-auto bg-white rounded-xl shadow-lg'>
             <table className='w-full table-auto text-left'>
-              <thead className='bg-green-700 text-white'>
+              <thead className='bg-foundation-primary text-white'>
                 <tr>
                   <th className='px-6 py-4'>Title</th>
                   <th className='px-6 py-4'>Company</th>
@@ -78,7 +77,7 @@ export default function AllJobsPage() {
                 {jobs.map((job) => (
                   <tr
                     key={job._id}
-                    className='border-b border-green-100 hover:bg-green-50'
+                    className='border-b border-foundation-pale hover:bg-foundation-background'
                   >
                     <td className='px-6 py-4'>{job.title}</td>
                     <td className='px-6 py-4'>{job.company}</td>
@@ -96,7 +95,10 @@ export default function AllJobsPage() {
                 ))}
                 {jobs.length === 0 && (
                   <tr>
-                    <td colSpan='6' className='text-center py-10 text-gray-500'>
+                    <td
+                      colSpan='6'
+                      className='text-center py-10 text-foundation-softblue'
+                    >
                       No jobs found.
                     </td>
                   </tr>

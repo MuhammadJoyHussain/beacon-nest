@@ -1,4 +1,4 @@
-import Header from '@/components/Header'
+import Header from '@/components/dashboard/Header'
 import Button from '@/components/ui/Button'
 import Checkbox from '@/components/ui/Checkbox'
 import Input from '@/components/ui/Input'
@@ -10,6 +10,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import Footer from '@/components/Footer'
+import { FileText, Upload } from 'lucide-react'
 
 const Register = () => {
   const { register, handleSubmit, reset, setValue, watch } = useForm({
@@ -52,6 +53,49 @@ const Register = () => {
     'Germany',
   ]
 
+  // Define input fields for each section
+  const personalFields = [
+    { name: 'firstName', placeholder: 'First Name*' },
+    { name: 'lastName', placeholder: 'Last Name*' },
+    { name: 'dob', placeholder: 'Date of Birth*', type: 'date' },
+    { name: 'shareCode', placeholder: 'Share Code*' },
+  ]
+
+  const contactFields = [
+    { name: 'email', placeholder: 'Email*', type: 'email' },
+    { name: 'phone', placeholder: 'Phone Number*' },
+  ]
+
+  const addressFields = [
+    { name: 'street', placeholder: 'Street Address*' },
+    { name: 'city', placeholder: 'City*' },
+    { name: 'postcode', placeholder: 'Postcode*' },
+  ]
+
+  const experienceFields = [
+    { name: 'position', placeholder: 'Position*' },
+    { name: 'company', placeholder: 'Company*' },
+    { name: 'startDate', placeholder: 'Start Date*', type: 'date' },
+    { name: 'endDate', placeholder: 'End Date', type: 'date' },
+    { name: 'expCity', placeholder: 'City' },
+    { name: 'expCountry', placeholder: 'Country' },
+  ]
+
+  const accountFields = [
+    { name: 'username', placeholder: 'Username*' },
+    { name: 'password', placeholder: 'Password*', type: 'password' },
+    {
+      name: 'confirmPassword',
+      placeholder: 'Confirm Password*',
+      type: 'password',
+    },
+  ]
+
+  const policyFields = [
+    { name: 'terms', label: 'Terms & Conditions*', href: '/terms' },
+    { name: 'gdpr', label: 'GDPR*', href: '/gdpr' },
+  ]
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setValue(name, type === 'checkbox' ? checked : value)
@@ -71,8 +115,6 @@ const Register = () => {
       toast.success('PDF uploaded, form data extracted!')
 
       const data = res.data
-      console.log(data)
-
       if (data.employeeExperience && data.employeeExperience.length > 0) {
         const exp = data.employeeExperience[0]
         setValue('position', exp.position || '')
@@ -105,8 +147,6 @@ const Register = () => {
 
     try {
       const { data: resData } = await api.post('auth/register', data)
-      console.log(data)
-
       localStorage.setItem('token', resData.token)
       toast.success('Registration successful! Redirecting...')
       setTimeout(() => router.push('/profile'), 1500)
@@ -116,56 +156,67 @@ const Register = () => {
   }
 
   return (
-    <div className='min-h-screen bg-green-50'>
+    <div className='min-h-screen background text-[#3D52A0]'>
       <Header />
-      <div className='pt-20 pb-16 px-6 text-black'>
+      <div className='pt-20 pb-16 px-4'>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className='max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-10 space-y-10'
+          className='max-w-4xl bg-white mx-auto shadow-xl rounded-3xl p-10 space-y-10'
         >
-          <h2 className='text-3xl font-extrabold text-green-800 text-center'>
-            Employee Registration
-          </h2>
+          <h2>Employee Registration</h2>
 
           {/* Upload */}
-          <section className='space-y-2'>
-            <h3 className='text-2xl font-semibold text-green-700'>Upload CV</h3>
-            <input
-              type='file'
-              accept='application/pdf'
-              onChange={handleFileChange}
-              className='border border-green-300 rounded px-3 py-2 bg-green-50 text-green-900'
-            />
+          <section className='space-y-4'>
+            <h3 className='text-xl font-semibold text-[#3D52A0]'>Upload CV</h3>
+
+            <div className='relative w-full bg-[#F3F4FA] border border-[#ADBBDA] rounded-2xl p-6 flex items-center justify-between hover:shadow-md transition-shadow'>
+              <div className='flex items-center gap-4'>
+                <div className='bg-[#7091E6] p-3 rounded-xl'>
+                  <FileText className='text-white w-6 h-6' />
+                </div>
+                <div>
+                  <p className='text-sm font-medium text-[#3D52A0]'>
+                    {file ? file.name : 'No file selected'}
+                  </p>
+                  <p className='text-xs text-gray-500'>
+                    Upload only PDF format. Max size 5MB.
+                  </p>
+                </div>
+              </div>
+
+              <label
+                htmlFor='cv-upload'
+                className='inline-flex items-center gap-2 text-sm text-white bg-[#7091E6] px-4 py-2 rounded-lg cursor-pointer hover:bg-[#3D52A0] transition-colors'
+              >
+                <Upload className='w-4 h-4' />
+                Upload
+                <input
+                  id='cv-upload'
+                  type='file'
+                  accept='application/pdf'
+                  onChange={handleFileChange}
+                  className='hidden'
+                />
+              </label>
+            </div>
           </section>
 
           {/* Personal Details */}
           <section className='space-y-6'>
-            <h3 className='text-2xl font-semibold text-green-700'>
-              Personal Details
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='firstName'
-                placeholder='First Name*'
-                register={register}
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-              <Input
-                name='lastName'
-                placeholder='Last Name*'
-                register={register}
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-              <Input
-                name='dob'
-                type='date'
-                placeholder='Date of Birth*'
-                register={register}
-                value={formData.dob}
-                onChange={handleChange}
-              />
+            <h3>Personal Details</h3>
+            <div className='grid md:grid-cols-2 gap-6'>
+              {personalFields.map(({ name, placeholder, type }) => (
+                <Input
+                  key={name}
+                  label={placeholder}
+                  name={name}
+                  type={type || 'text'}
+                  placeholder={placeholder}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              ))}
               <Select
                 name='gender'
                 {...register('gender')}
@@ -179,206 +230,156 @@ const Register = () => {
                   </SelectItem>
                 ))}
               </Select>
-              <Input
-                name='shareCode'
-                placeholder='Share Code*'
-                {...register('shareCode')}
-                value={formData.shareCode}
-                onChange={handleChange}
-              />
             </div>
           </section>
 
-          {/* Contact Info */}
+          {/* Contact Information */}
           <section className='space-y-6'>
-            <h3 className='text-2xl font-semibold text-green-700'>
-              Contact Information
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='email'
-                type='email'
-                placeholder='Email*'
-                register={register}
-                value={formData.email}
-                onChange={handleChange}
-              />
-              <Input
-                name='phone'
-                placeholder='Phone Number*'
-                register={register}
-                value={formData.phone}
-                onChange={handleChange}
-              />
+            <h3>Contact Information</h3>
+            <div className='grid md:grid-cols-2 gap-6'>
+              {contactFields.map(({ name, placeholder, type }) => (
+                <Input
+                  key={name}
+                  name={name}
+                  label={placeholder}
+                  type={type || 'text'}
+                  placeholder={placeholder}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              ))}
             </div>
           </section>
 
           {/* Address */}
           <section className='space-y-6'>
-            <h3 className='text-2xl font-semibold text-green-700'>Address</h3>
-            <Input
-              name='street'
-              placeholder='Street Address*'
-              register={register}
-              value={formData.street}
-              onChange={handleChange}
-            />
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='city'
-                placeholder='City*'
-                register={register}
-                value={formData.city}
-                onChange={handleChange}
-              />
-              <Input
-                name='postcode'
-                placeholder='Postcode*'
-                register={register}
-                value={formData.postcode}
-                onChange={handleChange}
-              />
-            </div>
-            <Select
-              name='country'
-              register={register}
-              value={formData.country}
-              onChange={handleChange}
-            >
-              <option value=''>Select Country*</option>
-              {countries.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
+            <h3>Address</h3>
+            <div className='grid md:grid-cols-2 gap-6'>
+              {addressFields.map(({ name, placeholder }) => (
+                <Input
+                  key={name}
+                  name={name}
+                  label={placeholder}
+                  placeholder={placeholder}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
               ))}
-            </Select>
+              <Select
+                className='pt-6'
+                name='country'
+                register={register}
+                value={formData.country}
+                onChange={handleChange}
+              >
+                <option value=''>Select Country*</option>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
           </section>
 
-          {/* Experience */}
+          {/* Employee Experience */}
           <section className='space-y-6'>
-            <h3 className='text-2xl font-semibold text-green-700'>
-              Employee Experience
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='position'
-                placeholder='Position*'
-                register={register}
-                value={formData.position}
-                onChange={handleChange}
-              />
-              <Input
-                name='company'
-                placeholder='Company*'
-                register={register}
-                value={formData.company}
-                onChange={handleChange}
-              />
+            <h3>Employee Experience</h3>
+            <div className='grid md:grid-cols-2 gap-6'>
+              {experienceFields.slice(0, 2).map(({ name, placeholder }) => (
+                <Input
+                  key={name}
+                  name={name}
+                  placeholder={placeholder}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              ))}
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='startDate'
-                type='date'
-                placeholder='Start Date*'
-                register={register}
-                value={formData.startDate}
-                onChange={handleChange}
-              />
-              <Input
-                name='endDate'
-                type='date'
-                placeholder='End Date'
-                register={register}
-                value={formData.endDate}
-                onChange={handleChange}
-              />
+            <div className='grid md:grid-cols-2 gap-6'>
+              {experienceFields
+                .slice(2, 4)
+                .map(({ name, placeholder, type }) => (
+                  <Input
+                    key={name}
+                    name={name}
+                    placeholder={placeholder}
+                    type={type || 'text'}
+                    register={register}
+                    value={formData[name]}
+                    onChange={handleChange}
+                  />
+                ))}
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='expCity'
-                placeholder='City'
-                register={register}
-                value={formData.expCity}
-                onChange={handleChange}
-              />
-              <Input
-                name='expCountry'
-                placeholder='Country'
-                register={register}
-                value={formData.expCountry}
-                onChange={handleChange}
-              />
+            <div className='grid md:grid-cols-2 gap-6'>
+              {experienceFields.slice(4).map(({ name, placeholder }) => (
+                <Input
+                  key={name}
+                  name={name}
+                  placeholder={placeholder}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              ))}
             </div>
           </section>
 
           {/* Account Setup */}
           <section className='space-y-6'>
-            <h3 className='text-2xl font-semibold text-green-700'>
+            <h3 className='text-2xl font-semibold text-[#7091E6]'>
               Account Setup
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <Input
-                name='username'
-                placeholder='Username*'
-                {...register('username')}
-                value={formData.username}
-                onChange={handleChange}
-              />
-              <Input
-                name='password'
-                type='password'
-                placeholder='Password*'
-                {...register('password')}
-                value={formData.password}
-                onChange={handleChange}
-              />
+            <div className='grid md:grid-cols-2 gap-6'>
+              {accountFields.slice(0, 1).map(({ name, placeholder }) => (
+                <Input
+                  key={name}
+                  name={name}
+                  placeholder={placeholder}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              ))}
             </div>
-            <Input
-              name='confirmPassword'
-              type='password'
-              placeholder='Confirm Password*'
-              {...register('confirmPassword')}
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
+            <div className='grid md:grid-cols-2 gap-6'>
+              {accountFields.slice(1).map(({ name, placeholder, type }) => (
+                <Input
+                  key={name}
+                  name={name}
+                  placeholder={placeholder}
+                  type={type || 'text'}
+                  register={register}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              ))}
+            </div>
           </section>
 
-          {/* Consent */}
+          {/* Terms & Privacy */}
           <section className='space-y-3'>
-            <label className='flex items-center space-x-3'>
-              <Checkbox
-                name='terms'
-                checked={formData.terms}
-                onChange={handleChange}
-              />
-              <span className='text-green-900'>
-                I agree to the{' '}
-                <a href='/terms' className='underline'>
-                  Terms & Conditions*
-                </a>
-              </span>
-            </label>
-            <label className='flex items-center space-x-3'>
-              <Checkbox
-                name='gdpr'
-                checked={formData.gdpr}
-                onChange={handleChange}
-              />
-              <span className='text-green-900'>
-                I agree to the{' '}
-                <a href='/gdpr' className='underline'>
-                  GDPR Policy*
-                </a>
-              </span>
-            </label>
+            {policyFields.map(({ name, label, href }) => (
+              <label className='flex items-center space-x-3'>
+                <Checkbox
+                  name={name}
+                  checked={formData.name}
+                  onChange={handleChange}
+                />
+                <span>
+                  I agree to the{' '}
+                  <a href={href} className='underline text-[#3D52A0]'>
+                    {label}
+                  </a>
+                </span>
+              </label>
+            ))}
           </section>
 
-          <Button
-            type='submit'
-            className='w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition'
-          >
-            Register
-          </Button>
+          <Button type='submit'>Register</Button>
         </form>
       </div>
       <Footer />

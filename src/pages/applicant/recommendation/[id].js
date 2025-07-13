@@ -38,35 +38,31 @@ const VacancyDetail = () => {
 
   if (!vacancy) {
     return (
-      <div className='min-h-screen bg-green-50 flex items-center justify-center'>
+      <div className='min-h-screen bg-foundation-background flex items-center justify-center'>
         <p className='text-lg text-red-600'>Vacancy not found.</p>
       </div>
     )
   }
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen background'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
-        <Header />
-
         <main className='flex-grow overflow-auto p-6 pt-24'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
-            <h1 className='text-3xl font-bold text-green-800 text-center'>
-              {vacancy.title}
-            </h1>
+            <h2 className='text-start'>{vacancy.title}</h2>
 
-            <div className='text-gray-700 space-y-2 text-center'>
-              <p>
+            <div className='text-foundation-softblue space-y-2'>
+              <p className='text-lg'>
                 <strong>Company:</strong> {vacancy.company}
               </p>
-              <p>
+              <p className='text-lg'>
                 <strong>Location:</strong> {vacancy.location}
               </p>
-              <p>
+              <p className='text-lg'>
                 <strong>Type:</strong> {vacancy.type}
               </p>
-              <p>
+              <p className='text-lg'>
                 <strong>Salary:</strong> {vacancy.salary}
               </p>
             </div>
@@ -74,28 +70,32 @@ const VacancyDetail = () => {
             <section className='space-y-6'>
               {vacancy.companyOverview && (
                 <div>
-                  <h2 className='text-xl font-semibold text-green-700 mb-2'>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
                     Company Overview
                   </h2>
-                  <p className='text-gray-600'>{vacancy.companyOverview}</p>
+                  <p className='text-base text-foundation-softblue'>
+                    {vacancy.companyOverview}
+                  </p>
                 </div>
               )}
 
               {vacancy.jobSummary && (
                 <div>
-                  <h2 className='text-xl font-semibold text-green-700 mb-2'>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
                     Job Summary
                   </h2>
-                  <p className='text-gray-600'>{vacancy.jobSummary}</p>
+                  <p className='text-base text-foundation-softblue'>
+                    {vacancy.jobSummary}
+                  </p>
                 </div>
               )}
 
               {vacancy.keyResponsibilities?.length > 0 && (
                 <div>
-                  <h2 className='text-xl font-semibold text-green-700 mb-2'>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
                     Key Responsibilities
                   </h2>
-                  <ul className='list-disc list-inside text-gray-600 space-y-1'>
+                  <ul className='list-disc list-inside text-foundation-softblue space-y-1'>
                     {vacancy.keyResponsibilities.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
@@ -105,10 +105,10 @@ const VacancyDetail = () => {
 
               {vacancy.requiredQualifications?.length > 0 && (
                 <div>
-                  <h2 className='text-xl font-semibold text-green-700 mb-2'>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
                     Required Qualifications
                   </h2>
-                  <ul className='list-disc list-inside text-gray-600 space-y-1'>
+                  <ul className='list-disc list-inside text-foundation-softblue space-y-1'>
                     {vacancy.requiredQualifications.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
@@ -118,10 +118,10 @@ const VacancyDetail = () => {
 
               {vacancy.preferredQualifications?.length > 0 && (
                 <div>
-                  <h2 className='text-xl font-semibold text-green-700 mb-2'>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
                     Preferred Qualifications
                   </h2>
-                  <ul className='list-disc list-inside text-gray-600 space-y-1'>
+                  <ul className='list-disc list-inside text-foundation-softblue space-y-1'>
                     {vacancy.preferredQualifications.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
@@ -131,10 +131,10 @@ const VacancyDetail = () => {
 
               {vacancy.benefits?.length > 0 && (
                 <div>
-                  <h2 className='text-xl font-semibold text-green-700 mb-2'>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
                     Benefits
                   </h2>
-                  <ul className='list-disc list-inside text-gray-600 space-y-1'>
+                  <ul className='list-disc list-inside text-foundation-softblue space-y-1'>
                     {vacancy.benefits.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}

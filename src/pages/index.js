@@ -4,6 +4,7 @@ import { Briefcase, Globe, Users } from 'lucide-react'
 import Header from '@/components/dashboard/Header'
 import Footer from '@/components/Footer'
 import api from '@/utils/api'
+import LoadingScreen from '@/components/Loading'
 
 const HomePage = () => {
   const [jobs, setJobs] = useState([])
@@ -14,14 +15,12 @@ const HomePage = () => {
     setLoading(true)
     try {
       const { data } = await api.get('/vacancy', {
-        params: {
-          limit: 3,
-        },
+        params: { limit: 3 },
       })
-
       setJobs(data.results || [])
     } catch (error) {
       console.error('Error fetching vacancies:', error)
+      setError('Failed to load job listings.')
     } finally {
       setLoading(false)
     }
@@ -34,110 +33,108 @@ const HomePage = () => {
     return () => clearTimeout(delay)
   }, [])
 
+  if (loading) {
+    return <LoadingScreen />
+  }
+
   return (
-    <div>
+    <div className='bg-[#EDE8F5] text-[#3D52A0] min-h-screen pt-16'>
       <Header />
-      <div className='bg-white text-gray-800 pt-16'>
-        {/* Hero */}
-        <section className='bg-gradient-to-r from-green-400 to-green-600 text-white py-20 px-4'>
-          <div className='max-w-7xl mx-auto text-center'>
-            <h1 className='text-4xl md:text-5xl font-bold mb-4'>
-              Find Your Dream Job
-            </h1>
-            <p className='text-lg md:text-xl mb-8'>
-              Connect with top employers and land your ideal role today.
-            </p>
-            <Link
-              href='/career'
-              className='inline-block bg-white text-green-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition'
-            >
-              Browse Jobs
-            </Link>
-          </div>
-        </section>
 
-        {/* Features */}
-        <section className='py-16 px-4'>
-          <div className='max-w-6xl mx-auto grid md:grid-cols-3 gap-10 text-center'>
-            <div>
-              <Briefcase className='mx-auto mb-4 text-green-600' size={32} />
-              <h3 className='text-xl font-semibold mb-2'>Top Companies</h3>
-              <p>
-                We partner with the most reputable companies across industries.
-              </p>
-            </div>
-            <div>
-              <Users className='mx-auto mb-4 text-green-600' size={32} />
-              <h3 className='text-xl font-semibold mb-2'>Community Focused</h3>
-              <p>We support a diverse network of job seekers and employers.</p>
-            </div>
-            <div>
-              <Globe className='mx-auto mb-4 text-green-600' size={32} />
-              <h3 className='text-xl font-semibold mb-2'>Global Reach</h3>
-              <p>Find opportunities across the globe or in your local city.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Popular Jobs */}
-        <section className='bg-gray-50 py-16 px-4'>
-          <div className='max-w-6xl mx-auto'>
-            <h2 className='text-3xl font-bold mb-8 text-center'>
-              Popular Job Listings
-            </h2>
-
-            {loading && <p className='text-center'>Loading jobs...</p>}
-            {error && <p className='text-center text-red-600'>{error}</p>}
-
-            {!loading && !error && (
-              <div className='grid md:grid-cols-3 gap-6'>
-                {jobs.length > 0 ? (
-                  jobs.map((job) => (
-                    <div
-                      key={job._id}
-                      className='bg-white p-6 rounded-xl shadow hover:shadow-md transition'
-                    >
-                      <h3 className='text-lg font-semibold mb-1'>
-                        {job.title}
-                      </h3>
-                      <p className='text-sm text-gray-500'>
-                        {job.company} – {job.location}
-                      </p>
-                      <Link
-                        href={`/career/${job._id}`}
-                        className='text-green-600 font-medium mt-4 inline-block hover:underline'
-                      >
-                        View Job →
-                      </Link>
-                    </div>
-                  ))
-                ) : (
-                  <p className='text-center text-gray-600'>
-                    No job listings found.
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Call to Action */}
-        <section className='py-20 bg-gradient-to-r from-green-400 to-green-600 text-white text-center px-4'>
-          <h2 className='text-3xl md:text-4xl font-bold mb-4'>
-            Ready to Take the Next Step?
-          </h2>
-          <p className='mb-8 text-lg'>
-            Join thousands of job seekers and build your future with Beacon
-            Nest.
+      {/* Hero Section */}
+      <section className='py-24 px-4 text-center relative overflow-hidden'>
+        <div className='max-w-6xl mx-auto'>
+          <h1 className=''>Beacon Nest</h1>
+          <p className='mx-auto'>
+            Elevate your career with real opportunities from top companies.
           </p>
           <Link
-            href='/register'
-            className='bg-white text-green-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition'
+            href='/career'
+            className='inline-block mt-8 bg-[#3D52A0] text-white px-6 py-3 rounded-full font-medium hover:bg-[#7091E6] transition'
           >
-            Create Account
+            Browse Jobs
           </Link>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      {/* Feature Icons */}
+      <section className='py-16 bg-[#ADBBDA] text-[#3D52A0]'>
+        <div className='max-w-6xl mx-auto grid md:grid-cols-3 gap-10 text-center px-4'>
+          <div>
+            <Briefcase className='mx-auto mb-4 text-[#3D52A0]' size={36} />
+            <h4>Top Companies</h4>
+            <p className='text-[#3D52A0]/70'>
+              We partner with the most reputable companies across industries.
+            </p>
+          </div>
+          <div>
+            <Users className='mx-auto mb-4 text-[#3D52A0]' size={36} />
+            <h4>Community Focused</h4>
+            <p className='text-[#3D52A0]/70'>
+              We support a diverse network of job seekers and employers.
+            </p>
+          </div>
+          <div>
+            <Globe className='mx-auto mb-4 text-[#3D52A0]' size={36} />
+            <h4>Global Reach</h4>
+            <p className='text-[#3D52A0]/70'>
+              Find opportunities across the globe or in your local city.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Jobs */}
+      <section className='py-20 px-4 bg-[#7091E6]/10 text-[#3D52A0]'>
+        <div className='max-w-6xl mx-auto'>
+          <h2 className='text-3xl font-bold mb-10 text-center'>
+            Popular Job Listings
+          </h2>
+
+          {!loading && !error && (
+            <div className='grid md:grid-cols-3 gap-6'>
+              {jobs.length > 0 ? (
+                jobs.map((job) => (
+                  <div
+                    key={job._id}
+                    className='bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition duration-300'
+                  >
+                    <h4 className='text-lg font-semibold mb-1'>{job.title}</h4>
+                    <p className='text-sm text-[#8697C4] mb-3'>
+                      {job.company} – {job.location}
+                    </p>
+                    <Link
+                      href={`/career/${job._id}`}
+                      className='text-[#7091E6] font-medium hover:underline'
+                    >
+                      View Job →
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <p className='text-center'>No job listings found.</p>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className='py-20 px-4 bg-[#7091E6] text-white text-center'>
+        <h2 className='text-3xl md:text-4xl font-bold mb-4'>
+          Ready to Take the Next Step?
+        </h2>
+        <p className='mb-8 text-lg max-w-xl mx-auto'>
+          Join thousands of job seekers and build your future with Beacon Nest.
+        </p>
+        <Link
+          href='/register'
+          className='bg-white text-[#3D52A0] font-semibold px-6 py-3 rounded-full hover:bg-[#EDE8F5] transition'
+        >
+          Create Account
+        </Link>
+      </section>
+
       <Footer />
     </div>
   )

@@ -1,12 +1,14 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import api from '@/utils/api'
-import Header from '@/components/Header'
+import Header from '@/components/dashboard/Header'
 import Footer from '@/components/Footer'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
+import Textarea from '@/components/ui/Textarea'
+import Checkbox from '@/components/ui/Checkbox'
 import { toast, Toaster } from 'react-hot-toast'
-import LoadingScreen from '@/components/loading'
+import LoadingScreen from '@/components/Loading'
 
 export default function ApplyJob() {
   const router = useRouter()
@@ -80,40 +82,32 @@ export default function ApplyJob() {
   if (!user) return null
 
   return (
-    <div className='min-h-screen bg-green-50'>
+    <div className='min-h-screen bg-muted'>
       <Toaster />
       <Header />
-      <main className='max-w-3xl mx-auto px-6 pt-24 pb-10 text-black'>
+      <main className='max-w-3xl mx-auto px-6 pt-24 pb-10 text-primary'>
         <div className='bg-white p-8 rounded-xl shadow-md'>
-          <h1 className='text-2xl font-bold mb-6 text-green-800'>
+          <h1 className='text-2xl font-bold mb-6 text-primary'>
             Apply for Job
           </h1>
 
           <form className='space-y-6' onSubmit={handleSubmit}>
-            <div>
-              <label className='block text-gray-700 font-medium mb-2'>
-                Cover Letter
-              </label>
-              <textarea
-                rows={5}
-                value={coverLetter}
-                onChange={(e) => setCoverLetter(e.target.value)}
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:outline-none'
-                required
-              />
-            </div>
+            <Textarea
+              label='Cover Letter'
+              name='coverLetter'
+              value={coverLetter}
+              onChange={(e) => setCoverLetter(e.target.value)}
+              rows={5}
+              required
+            />
 
-            <div>
-              <label className='block text-gray-700 font-medium mb-2'>
-                Why do you want this job?
-              </label>
-              <textarea
-                rows={3}
-                value={additionalInfo}
-                onChange={(e) => setAdditionalInfo(e.target.value)}
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:outline-none'
-              />
-            </div>
+            <Textarea
+              label='Why do you want this job?'
+              name='additionalInfo'
+              value={additionalInfo}
+              onChange={(e) => setAdditionalInfo(e.target.value)}
+              rows={3}
+            />
 
             <Input
               label='Expected Salary'
@@ -146,20 +140,14 @@ export default function ApplyJob() {
               required
             />
 
-            <div className='flex items-center gap-2'>
-              <input
-                id='authorized'
-                type='checkbox'
-                checked={authorized}
-                onChange={() => setAuthorized(!authorized)}
-                className='h-4 w-4 border-gray-300 rounded'
-              />
-              <label htmlFor='authorized' className='text-gray-700'>
-                I am authorized to work in this country
-              </label>
-            </div>
+            <Checkbox
+              name='authorized'
+              label='I am authorized to work in this country'
+              checked={authorized}
+              onChange={() => setAuthorized(!authorized)}
+            />
 
-            <Button type='submit' className='bg-green-600 text-white w-full'>
+            <Button type='submit' className='bg-primary text-white w-full'>
               Submit Application
             </Button>
           </form>

@@ -4,14 +4,14 @@ import Header from '@/components/dashboard/Header'
 import api from '@/utils/api'
 import dynamic from 'next/dynamic'
 
+const LoadingScreen = dynamic(() => import('@/components/Loading'), {
+  ssr: false,
+})
+
 const Joblist = () => {
   const [appliedJobs, setAppliedJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  const LoadingScreen = dynamic(() => import('@/components/Loading'), {
-    ssr: false,
-  })
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -29,7 +29,6 @@ const Joblist = () => {
           },
         })
 
-        // Format data to match expected job card format
         const jobs = data.map((app) => ({
           title: app.job.title,
           company: app.job.company,
@@ -49,23 +48,22 @@ const Joblist = () => {
     fetchApplications()
   }, [])
 
-  if (loading) {
-    return <LoadingScreen />
-  }
+  if (loading) return <LoadingScreen />
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen bg-foundation-background'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
-        <Header />
-        <main className='flex-grow overflow-auto p-6 pt-24'>
+        <main className='flex-grow overflow-auto p-6'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
-            <h2 className='text-3xl font-bold text-green-800 text-center'>
-              My Applications
-            </h2>
+            <h2>My Applications</h2>
+
+            {error && (
+              <div className='text-center text-red-500 text-lg'>{error}</div>
+            )}
 
             {appliedJobs.length === 0 ? (
-              <div className='text-center text-gray-500 text-lg py-10'>
+              <div className='text-center text-foundation-softblue text-lg py-10'>
                 You haven’t applied for any jobs yet.
               </div>
             ) : (
@@ -73,16 +71,14 @@ const Joblist = () => {
                 {appliedJobs.map((job, index) => (
                   <div
                     key={index}
-                    className='bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition'
+                    className='bg-foundation-pale rounded-xl p-6 shadow-sm hover:shadow-md transition'
                   >
-                    <h3 className='text-xl font-semibold text-green-700 mb-1'>
-                      {job.title}
-                    </h3>
-                    <p className='text-gray-700 mb-1'>{job.company}</p>
-                    <p className='text-sm text-gray-500'>
+                    <h3 className='text-white'>{job.title}</h3>
+                    <p className='text-white'>{job.company}</p>
+                    <p className='text-sm text-white'>
                       Applied: {job.dateApplied}
                     </p>
-                    <span className='inline-block mt-3 px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium'>
+                    <span className='inline-block mt-3 px-3 py-1 text-sm rounded-full bg-foundation-blue text-white font-medium'>
                       {job.status}
                     </span>
                   </div>

@@ -100,7 +100,7 @@ export default function JobApplicationsPage() {
   }
 
   return (
-    <div className='flex min-h-screen bg-green-50 text-green-900'>
+    <div className='flex min-h-screen bg-foundation-background text-foundation-primary'>
       <Sidebar />
       <main className='flex-1 flex flex-col'>
         <Header />
@@ -111,7 +111,7 @@ export default function JobApplicationsPage() {
 
           <div className='overflow-x-auto bg-white rounded-xl shadow-lg'>
             <table className='w-full table-auto text-left'>
-              <thead className='bg-green-700 text-white'>
+              <thead className='bg-foundation-primary text-white'>
                 <tr>
                   <th className='px-6 py-4'>Name</th>
                   <th className='px-6 py-4'>Email</th>
@@ -122,7 +122,7 @@ export default function JobApplicationsPage() {
               <tbody>
                 {applications.map((a) =>
                   editingId === a._id ? (
-                    <tr key={a._id} className='bg-green-100'>
+                    <tr key={a._id} className='bg-foundation-pale'>
                       <td className='px-6 py-4'>
                         <Input
                           name='fullName'
@@ -157,13 +157,19 @@ export default function JobApplicationsPage() {
                       </td>
                       <td className='px-6 py-4 text-center space-x-2'>
                         <Button onClick={handleUpdate}>Save</Button>
-                        <Button onClick={() => setEditingId(null)}>
+                        <Button
+                          className='bg-foundation-pale text-foundation-primary'
+                          onClick={() => setEditingId(null)}
+                        >
                           Cancel
                         </Button>
                       </td>
                     </tr>
                   ) : (
-                    <tr key={a._id} className='border-b hover:bg-green-50'>
+                    <tr
+                      key={a._id}
+                      className='border-b border-foundation-pale hover:bg-foundation-background'
+                    >
                       <td className='px-6 py-4'>{a.fullName}</td>
                       <td className='px-6 py-4'>{a.email}</td>
                       <td className='px-6 py-4'>{a.status}</td>
@@ -181,7 +187,10 @@ export default function JobApplicationsPage() {
                 )}
                 {applications.length === 0 && (
                   <tr>
-                    <td colSpan='4' className='text-center py-10 text-gray-500'>
+                    <td
+                      colSpan='4'
+                      className='text-center py-10 text-foundation-softblue'
+                    >
                       No applications found.
                     </td>
                   </tr>

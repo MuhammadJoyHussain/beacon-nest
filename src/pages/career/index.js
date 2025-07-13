@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Header from '@/components/Header'
+import Header from '@/components/dashboard/Header'
 import Footer from '@/components/Footer'
 import api from '@/utils/api'
 import dynamic from 'next/dynamic'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import SelectItem from '@/components/ui/SelectItem'
 
 const Vacancies = () => {
   const [search, setSearch] = useState('')
@@ -55,70 +58,71 @@ const Vacancies = () => {
     if (page < totalPages) setPage((prev) => prev + 1)
   }
 
-  if (loading) {
-    return <LoadingScreen />
-  }
+  if (loading) return <LoadingScreen />
 
   return (
-    <div className='min-h-screen bg-green-50 text-gray-800'>
+    <div className='min-h-screen bg-foundation-primaryLight text-foundation-text'>
       <Header />
       <div className='max-w-5xl mx-auto p-6 pt-24'>
         {/* Filters */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-5 mb-8'>
-          <input
-            type='text'
+          <Input
+            name='search'
             placeholder='Search by title, company, or location...'
             value={search}
             onChange={(e) => {
               setPage(1)
               setSearch(e.target.value)
             }}
-            className='w-full px-5 py-3 border border-green-300 rounded-lg shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500
-                       placeholder-gray-400 text-gray-700 bg-white'
           />
 
-          <select
+          <Select
+            name='type'
             value={type}
             onChange={(e) => {
               setPage(1)
               setType(e.target.value)
             }}
-            className='w-full px-5 py-3 border border-green-300 rounded-lg shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 bg-white'
           >
             <option value=''>All Types</option>
-            <option value='Full-Time'>Full-Time</option>
-            <option value='Part-Time'>Part-Time</option>
-            <option value='Contract'>Contract</option>
-          </select>
+            {['Full-Time', 'Part-Time', 'Contract'].map((option) => (
+              <SelectItem key={option} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+          </Select>
 
-          <select
+          <Select
+            name='department'
             value={department}
             onChange={(e) => {
               setPage(1)
               setDepartment(e.target.value)
             }}
-            className='w-full px-5 py-3 border border-green-300 rounded-lg shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 bg-white'
           >
             <option value=''>All Departments</option>
-            <option value='Engineering'>Engineering</option>
-            <option value='Marketing'>Marketing</option>
-            <option value='Design'>Design</option>
-            <option value='Product'>Product</option>
-            <option value='Customer Success'>Customer Success</option>
-            <option value='Sales'>Sales</option>
-            <option value='Infrastructure'>Infrastructure</option>
-            <option value='Content Marketing'>Content Marketing</option>
-            <option value='Human Resources'>Human Resources</option>
-            <option value='Data & AI'>Data & AI</option>
-          </select>
+            {[
+              'Engineering',
+              'Marketing',
+              'Design',
+              'Product',
+              'Customer Success',
+              'Sales',
+              'Infrastructure',
+              'Content Marketing',
+              'Human Resources',
+              'Data & AI',
+            ].map((dept) => (
+              <SelectItem key={dept} value={dept}>
+                {dept}
+              </SelectItem>
+            ))}
+          </Select>
         </div>
 
         {/* Loader / Empty / Jobs */}
         {vacancies.length === 0 ? (
-          <p className='text-center text-gray-500 text-lg py-10'>
+          <p className='text-center text-foundation-mutedText text-lg py-10'>
             No vacancies found.
           </p>
         ) : (
@@ -126,22 +130,24 @@ const Vacancies = () => {
             {vacancies.map((job) => (
               <li
                 key={job._id}
-                className='border border-green-200 rounded-xl shadow-sm bg-white
+                className='border border-foundation-border rounded-xl shadow-sm bg-white
                            hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer'
               >
                 <Link href={`/career/${job._id}`} className='block'>
                   <div className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0'>
-                    <h3 className='text-xl font-semibold text-green-800'>
+                    <h3 className='text-xl font-semibold text-foundation-primary'>
                       {job.title}
                     </h3>
-                    <span className='inline-block bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-full text-sm'>
+                    <span className='inline-block bg-foundation-primaryLight text-foundation-primary font-semibold px-3 py-1 rounded-full text-sm'>
                       {job.type}
                     </span>
                   </div>
-                  <p className='mt-2 text-gray-700 font-medium'>
+                  <p className='mt-2 text-foundation-text font-medium'>
                     {job.company}
                   </p>
-                  <p className='mt-1 text-gray-600'>{job.location}</p>
+                  <p className='mt-1 text-foundation-mutedText'>
+                    {job.location}
+                  </p>
                 </Link>
               </li>
             ))}
@@ -158,12 +164,12 @@ const Vacancies = () => {
                 ${
                   page === 1
                     ? 'bg-gray-200 cursor-not-allowed text-gray-500 border-gray-300'
-                    : 'bg-white hover:bg-green-50 text-green-600 border-green-600'
+                    : 'bg-white hover:bg-foundation-primaryLight text-foundation-primary border-foundation-primary'
                 }`}
             >
               Previous
             </button>
-            <span className='text-gray-700 font-semibold'>
+            <span className='text-foundation-text font-semibold'>
               Page {page} of {totalPages}
             </span>
             <button
@@ -173,7 +179,7 @@ const Vacancies = () => {
                 ${
                   page === totalPages
                     ? 'bg-gray-200 cursor-not-allowed text-gray-500 border-gray-300'
-                    : 'bg-white hover:bg-green-50 text-green-600 border-green-600'
+                    : 'bg-white hover:bg-foundation-primaryLight text-foundation-primary border-foundation-primary'
                 }`}
             >
               Next

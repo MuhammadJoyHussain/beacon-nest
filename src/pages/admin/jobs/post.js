@@ -65,7 +65,9 @@ export default function CreateJobPage() {
 
   const renderArrayField = (field, label) => (
     <div className='mb-6'>
-      <label className='block font-semibold mb-2'>{label}</label>
+      <label className='block font-semibold text-foundation-primary mb-2'>
+        {label}
+      </label>
       {form[field].map((item, index) => (
         <div key={index} className='flex items-center gap-2 mb-2'>
           <Input
@@ -91,17 +93,17 @@ export default function CreateJobPage() {
   )
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen bg-foundation-background text-foundation-primary'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <Header />
-        <main className='text-green-800 w-full pt-20  py-6 sm:px-8 mx-auto overflow-auto'>
+        <main className='w-full pt-20 pb-16 px-4 sm:px-8 max-w-4xl mx-auto overflow-auto'>
           <h1 className='text-3xl font-bold mb-8 text-center'>
             Post a New Job
           </h1>
           <form
             onSubmit={handleSubmit}
-            className='space-y-6 bg-white p-6 rounded-xl shadow px-24'
+            className='space-y-6 bg-white p-6 sm:p-10 rounded-xl shadow'
           >
             <Input
               name='title'

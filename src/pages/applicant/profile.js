@@ -4,6 +4,7 @@ import api from '@/utils/api'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 import dynamic from 'next/dynamic'
+import ProfileItem from '@/components/ProfileItem'
 
 const LoadingScreen = dynamic(() => import('@/components/Loading'), {
   ssr: false,
@@ -39,45 +40,42 @@ export default function Profile() {
     fetchProfile()
   }, [router])
 
-  if (loading) {
-    return <LoadingScreen />
-  }
+  if (loading) return <LoadingScreen />
 
   if (!user) {
     return (
-      <div className='flex h-screen items-center justify-center bg-gray-100'>
+      <div className='flex h-screen items-center justify-center bg-foundation-background'>
         <p className='text-red-600 text-xl'>User not found.</p>
       </div>
     )
   }
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen background'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
-        <Header />
-        <main className='flex-grow overflow-auto p-6 pt-24'>
+        <main className='flex-grow overflow-auto p-6'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-10'>
             <div className='flex flex-col items-center text-center'>
               {user?.profilePic ? (
                 <img
                   src={user.profilePic}
                   alt='Profile Picture'
-                  className='w-32 h-32 rounded-full border-4 border-blue-500 shadow-md object-cover'
+                  className='w-32 h-32 rounded-full border-4 border-foundation-blue shadow-md object-cover'
                 />
               ) : (
-                <div className='w-32 h-32 rounded-full bg-green-600 text-white flex items-center justify-center text-4xl font-bold border-4 border-blue-500 shadow-md'>
+                <div className='pro-pic'>
                   {getInitials(user?.firstName, user?.lastName)}
                 </div>
               )}
 
-              <h2 className='mt-4 text-3xl font-semibold text-gray-800'>
+              <h2>
                 {user?.firstName} {user?.lastName}
               </h2>
-              <p className='text-gray-500 text-lg'>{user?.email}</p>
+              <p>{user?.email}</p>
             </div>
 
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-700 text-base'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-foundation-primary text-base'>
               <ProfileItem label='Username' value={user?.username} />
               <ProfileItem label='Gender' value={user?.gender} />
               <ProfileItem
@@ -118,16 +116,6 @@ export default function Profile() {
           </div>
         </main>
       </div>
-    </div>
-  )
-}
-
-// Helper component
-function ProfileItem({ label, value }) {
-  return (
-    <div className='bg-gray-50 p-4 rounded-xl shadow-sm'>
-      <p className='text-sm text-gray-500'>{label}</p>
-      <p className='font-medium text-gray-800'>{value}</p>
     </div>
   )
 }

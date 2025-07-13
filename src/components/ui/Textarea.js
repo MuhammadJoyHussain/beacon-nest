@@ -11,7 +11,7 @@ export default function Textarea({
       {label && (
         <label
           htmlFor={name}
-          className='block font-semibold mb-2 text-green-800'
+          className='block font-semibold mb-2 text-foundation-primary'
         >
           {label}
         </label>
@@ -22,7 +22,7 @@ export default function Textarea({
         value={value}
         onChange={onChange}
         rows={4}
-        className={`w-full p-3 border rounded-md border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-green-900 ${className}`}
+        className={`w-full p-3 border rounded-md border-foundation-pale focus:outline-none focus:ring-2 focus:ring-foundation-blue bg-white text-foundation-primary ${className}`}
         {...props}
       />
     </div>

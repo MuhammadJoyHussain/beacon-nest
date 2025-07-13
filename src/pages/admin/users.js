@@ -90,7 +90,7 @@ export default function AdminUserManagement() {
   }
 
   return (
-    <div className='flex min-h-screen bg-green-50 text-green-900'>
+    <div className='flex min-h-screen bg-foundation-background text-foundation-primary'>
       <Sidebar />
 
       {/* Main Content */}
@@ -107,7 +107,7 @@ export default function AdminUserManagement() {
           {!loading && !error && (
             <div className='overflow-x-auto bg-white rounded-xl shadow-lg'>
               <table className='w-full table-auto text-left'>
-                <thead className='bg-green-700 text-white'>
+                <thead className='bg-foundation-primary text-white'>
                   <tr>
                     <th className='px-6 py-4'>Name</th>
                     <th className='px-6 py-4'>Email</th>
@@ -118,7 +118,7 @@ export default function AdminUserManagement() {
                 <tbody>
                   {users.map((user) =>
                     editingUserId === user._id ? (
-                      <tr key={user._id} className='bg-green-100'>
+                      <tr key={user._id} className='bg-foundation-pale'>
                         <td className='px-6 py-4'>
                           <div className='flex gap-2'>
                             <Input
@@ -156,7 +156,7 @@ export default function AdminUserManagement() {
                         <td className='px-6 py-4 text-center space-x-2'>
                           <Button onClick={handleUpdate}>Save</Button>
                           <Button
-                            className='bg-gray-300 text-green-900'
+                            className='bg-foundation-pale text-foundation-primary'
                             onClick={() => setEditingUserId(null)}
                           >
                             Cancel
@@ -166,7 +166,7 @@ export default function AdminUserManagement() {
                     ) : (
                       <tr
                         key={user._id}
-                        className='border-b border-green-100 hover:bg-green-50'
+                        className='border-b border-foundation-pale hover:bg-foundation-background'
                       >
                         <td className='px-6 py-4'>
                           {user.firstName} {user.lastName}
@@ -175,7 +175,7 @@ export default function AdminUserManagement() {
                         <td className='px-6 py-4 capitalize'>{user.role}</td>
                         <td className='px-6 py-4 text-center space-x-2'>
                           <Button
-                            className='bg-green-600 hover:bg-green-700'
+                            className='bg-foundation-primary hover:bg-opacity-90'
                             onClick={() => handleEditClick(user)}
                           >
                             Edit
