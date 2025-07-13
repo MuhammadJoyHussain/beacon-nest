@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api', // Your Express API URL
+  baseURL: 'https://backend-two-bice.vercel.app/api', 
 })
 
 export default api
