@@ -23,6 +23,7 @@ export default function ApplyJob() {
   const [linkedIn, setLinkedIn] = useState('')
   const [experienceYears, setExperienceYears] = useState('')
   const [authorized, setAuthorized] = useState(false)
+  const [cvFile, setCvFile] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -53,34 +54,41 @@ export default function ApplyJob() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (!cvFile) {
+      toast.error('Please upload your CV')
+      return
+    }
+
+    const token = localStorage.getItem('token')
+    const formData = new FormData()
+
+    formData.append('cv', cvFile)
+    formData.append('jobId', id)
+    formData.append('coverLetter', coverLetter)
+    formData.append('additionalInfo', additionalInfo)
+    formData.append('expectedSalary', expectedSalary)
+    formData.append('startDate', startDate)
+    formData.append('linkedIn', linkedIn)
+    formData.append('experienceYears', experienceYears)
+    formData.append('authorized', authorized)
+
     try {
-      await api.post(
-        `/application`,
-        {
-          jobId: id,
-          coverLetter,
-          additionalInfo,
-          expectedSalary,
-          startDate,
-          linkedIn,
-          experienceYears,
-          authorized,
+      await api.post('/application', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      )
-      toast.success('Application submitted!')
-      router.push('/joblists')
+      })
+
+      toast.success('Application submitted successfully!')
+      router.push('/applicant/myjobs')
     } catch (err) {
+      console.error(err)
       toast.error(err.response?.data?.message || 'Submission failed')
     }
   }
 
   if (loading) return <ApplyLoader />
-
   if (!user) return null
 
   return (
@@ -94,6 +102,23 @@ export default function ApplyJob() {
           </h1>
 
           <form className='space-y-6' onSubmit={handleSubmit}>
+            {/* CV Upload */}
+            <div>
+              <label className='block font-medium mb-1'>
+                Upload CV (PDF/DOC)
+              </label>
+              <input
+                type='file'
+                accept='.pdf,.doc,.docx'
+                onChange={(e) => setCvFile(e.target.files[0])}
+                required
+                className='block w-full border border-gray-300 rounded p-2'
+              />
+              {cvFile && (
+                <p className='text-sm mt-1'>Selected: {cvFile.name}</p>
+              )}
+            </div>
+
             <Textarea
               label='Cover Letter'
               name='coverLetter'

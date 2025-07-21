@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
-import Header from '@/components/dashboard/Header'
 import api from '@/utils/api'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import Link from 'next/link'
 
 const Joblist = () => {
   const [appliedJobs, setAppliedJobs] = useState([])
@@ -27,6 +27,7 @@ const Joblist = () => {
         })
 
         const jobs = data.map((app) => ({
+          _id: app._id,
           title: app.job.title,
           company: app.job.company,
           dateApplied: new Date(app.createdAt).toLocaleDateString(),
@@ -94,6 +95,11 @@ const Joblist = () => {
                     <span className='inline-block mt-3 px-3 py-1 text-sm rounded-full bg-foundation-blue text-white font-medium'>
                       {job.status}
                     </span>
+                    <Link href={`/applicant/job/${job._id}`}>
+                      <button className='mt-4 inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition'>
+                        View Details
+                      </button>
+                    </Link>
                   </div>
                 ))}
               </div>

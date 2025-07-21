@@ -9,17 +9,7 @@ import toast from 'react-hot-toast'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import api from '@/utils/api'
-
-function parseJwt(token) {
-  try {
-    const base64Payload = token.split('.')[1]
-    const payload = atob(base64Payload)
-    return JSON.parse(payload)
-  } catch (e) {
-    console.error('Failed to parse JWT', e)
-    return null
-  }
-}
+import { parseJwt } from '@/utils/parseJWT'
 
 export default function CreateJobPage() {
   const router = useRouter()

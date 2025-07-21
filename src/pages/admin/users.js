@@ -3,21 +3,10 @@ import { useEffect, useState } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Button from '@/components/ui/Button'
 import toast from 'react-hot-toast'
-import api from '@/utils/api'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import authApi from '@/utils/authApi'
-
-function parseJwt(token) {
-  try {
-    const base64Payload = token.split('.')[1]
-    const payload = atob(base64Payload)
-    return JSON.parse(payload)
-  } catch (e) {
-    console.error('Failed to parse JWT', e)
-    return null
-  }
-}
+import { parseJwt } from '@/utils/parseJWT'
 
 export default function AdminUserManagement() {
   const router = useRouter()

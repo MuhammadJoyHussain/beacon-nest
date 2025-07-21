@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Bell, Menu, X } from 'lucide-react'
 import api from '@/utils/api'
+import authApi from '@/utils/authApi'
 
 const Header = () => {
   const [user, setUser] = useState(null)
@@ -15,7 +16,7 @@ const Header = () => {
       if (!token) return
 
       try {
-        const { data } = await api.get('/auth/profile', {
+        const { data } = await authApi.get('/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
         setUser(data)
