@@ -4,7 +4,8 @@ import { Briefcase, Globe, Users } from 'lucide-react'
 import Header from '@/components/dashboard/Header'
 import Footer from '@/components/Footer'
 import api from '@/utils/api'
-import LoadingScreen from '@/components/Loading'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const HomePage = () => {
   const [jobs, setJobs] = useState([])
@@ -33,10 +34,6 @@ const HomePage = () => {
     return () => clearTimeout(delay)
   }, [])
 
-  if (loading) {
-    return <LoadingScreen />
-  }
-
   return (
     <div className='bg-[#EDE8F5] text-[#3D52A0] min-h-screen pt-16'>
       <Header />
@@ -44,8 +41,8 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className='py-24 px-4 text-center relative overflow-hidden'>
         <div className='max-w-6xl mx-auto'>
-          <h1 className=''>Beacon Nest</h1>
-          <p className='mx-auto'>
+          <h1 className='text-4xl font-bold'>Beacon Nest</h1>
+          <p className='mx-auto mt-4 text-lg'>
             Elevate your career with real opportunities from top companies.
           </p>
           <Link
@@ -91,15 +88,29 @@ const HomePage = () => {
             Popular Job Listings
           </h2>
 
-          {!loading && !error && (
+          {error ? (
+            <p className='text-center text-red-500'>{error}</p>
+          ) : (
             <div className='grid md:grid-cols-3 gap-6'>
-              {jobs.length > 0 ? (
+              {loading ? (
+                [...Array(3)].map((_, i) => (
+                  <div key={i} className='bg-white rounded-2xl p-6 shadow-lg'>
+                    <h4 className='mb-2 text-lg font-semibold'>
+                      <Skeleton width={120} />
+                    </h4>
+                    <p className='mb-3'>
+                      <Skeleton width={180} />
+                    </p>
+                    <Skeleton height={20} width={100} />
+                  </div>
+                ))
+              ) : jobs.length > 0 ? (
                 jobs.map((job) => (
                   <div
                     key={job._id}
                     className='bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition duration-300'
                   >
-                    <h4 className='text-lg font-semibold mb-1'>{job.title}</h4>
+                    <h3 className='text-lg font-semibold mb-1'>{job.title}</h3>
                     <p className='text-sm text-[#8697C4] mb-3'>
                       {job.company} – {job.location}
                     </p>

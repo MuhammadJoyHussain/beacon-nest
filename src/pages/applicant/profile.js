@@ -5,10 +5,9 @@ import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 import dynamic from 'next/dynamic'
 import ProfileItem from '@/components/ProfileItem'
-
-const LoadingScreen = dynamic(() => import('@/components/Loading'), {
-  ssr: false,
-})
+import authApi from '@/utils/authApi'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 export default function Profile() {
   const [user, setUser] = useState(null)
@@ -24,7 +23,7 @@ export default function Profile() {
       }
 
       try {
-        const { data } = await api.get('/auth/profile', {
+        const { data } = await authApi.get('/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
         setUser(data)
@@ -40,9 +39,36 @@ export default function Profile() {
     fetchProfile()
   }, [router])
 
-  if (loading) return <LoadingScreen />
+  function getProfileValue(label, user) {
+    switch (label) {
+      case 'Username':
+        return user.username
+      case 'Gender':
+        return user.gender
+      case 'Date of Birth':
+        return user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'
+      case 'Phone':
+        return user.phone
+      case 'Department':
+        return user.department || 'N/A'
+      case 'Position':
+        return user.position || 'N/A'
+      case 'Start Date':
+        return user.startDate
+          ? new Date(user.startDate).toLocaleDateString()
+          : 'N/A'
+      case 'Share Code':
+        return user.shareCode
+      case 'Address':
+        return user.street && user.city && user.postcode && user.country
+          ? `${user.street}, ${user.city}, ${user.postcode}, ${user.country}`
+          : 'N/A'
+      default:
+        return ''
+    }
+  }
 
-  if (!user) {
+  if (!loading && !user) {
     return (
       <div className='flex h-screen items-center justify-center bg-foundation-background'>
         <p className='text-red-600 text-xl'>User not found.</p>
@@ -57,7 +83,9 @@ export default function Profile() {
         <main className='flex-grow overflow-auto p-6'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-10'>
             <div className='flex flex-col items-center text-center'>
-              {user?.profilePic ? (
+              {loading ? (
+                <Skeleton circle height={128} width={128} />
+              ) : user?.profilePic ? (
                 <img
                   src={user.profilePic}
                   alt='Profile Picture'
@@ -70,48 +98,33 @@ export default function Profile() {
               )}
 
               <h2>
-                {user?.firstName} {user?.lastName}
+                {loading ? (
+                  <Skeleton width={120} />
+                ) : (
+                  `${user.firstName} ${user.lastName}`
+                )}
               </h2>
-              <p>{user?.email}</p>
+              <p>{loading ? <Skeleton width={200} /> : user.email}</p>
             </div>
 
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-foundation-primary text-base'>
-              <ProfileItem label='Username' value={user?.username} />
-              <ProfileItem label='Gender' value={user?.gender} />
-              <ProfileItem
-                label='Date of Birth'
-                value={
-                  user?.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'
-                }
-              />
-              <ProfileItem label='Phone' value={user?.phone} />
-              <ProfileItem
-                label='Department'
-                value={user?.department || 'N/A'}
-              />
-              <ProfileItem label='Position' value={user?.position || 'N/A'} />
-              <ProfileItem
-                label='Start Date'
-                value={
-                  user?.startDate
-                    ? new Date(user.startDate).toLocaleDateString()
-                    : 'N/A'
-                }
-              />
-              <ProfileItem label='Share Code' value={user?.shareCode} />
-              <div className='col-span-full'>
+              {[
+                'Username',
+                'Gender',
+                'Date of Birth',
+                'Phone',
+                'Department',
+                'Position',
+                'Start Date',
+                'Share Code',
+                'Address',
+              ].map((label, i) => (
                 <ProfileItem
-                  label='Address'
-                  value={
-                    user?.street &&
-                    user?.city &&
-                    user?.postcode &&
-                    user?.country
-                      ? `${user.street}, ${user.city}, ${user.postcode}, ${user.country}`
-                      : 'N/A'
-                  }
+                  key={i}
+                  label={label}
+                  value={loading ? <Skeleton /> : getProfileValue(label, user)}
                 />
-              </div>
+              ))}
             </div>
           </div>
         </main>

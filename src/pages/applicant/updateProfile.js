@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import api from '@/utils/api'
 import Sidebar from '@/components/dashboard/Sidebar'
-import Header from '@/components/dashboard/Header'
 import { Toaster, toast } from 'react-hot-toast'
-import LoadingScreen from '@/components/Loading'
 import Input from '@/components/ui/Input'
+import authApi from '@/utils/authApi'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
-const Profile = () => {
+const UpdateProfile = () => {
   const [formData, setFormData] = useState({
     phone: '',
     street: '',
@@ -28,7 +29,7 @@ const Profile = () => {
       if (!token) return router.push('/login')
 
       try {
-        const { data } = await api.get('/auth/profile', {
+        const { data } = await authApi.get('/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -75,7 +76,7 @@ const Profile = () => {
       const token = localStorage.getItem('token')
       const updatedField = { [field]: formData[field] }
 
-      await api.put('/auth/profile', updatedField, {
+      await authApi.put('/auth/profile', updatedField, {
         headers: { Authorization: `Bearer ${token}` },
       })
 
@@ -87,16 +88,14 @@ const Profile = () => {
     }
   }
 
-  if (loading) return <LoadingScreen />
-
   return (
     <div className='flex h-screen background'>
       <Toaster />
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <main className='flex-grow overflow-auto p-6'>
-          <div className='max-w-3xl mx-auto bg-white shadow-lg rounded-3xl p-10'>
-            <h2 className='text-4xl font-extrabold text-center text-[#3D52A0] mb-8'>
+          <div className='max-w-3xl mx-auto bg-white shadow-lg rounded-3xl p-4 sm:p-6 md:p-10'>
+            <h2 className='text-2xl sm:text-3xl md:text-4xl font-extrabold text-center text-[#3D52A0] mb-8'>
               Update Profile
             </h2>
 
@@ -110,40 +109,46 @@ const Profile = () => {
                 { name: 'shareCode', label: 'Share Code' },
               ].map((field) => (
                 <div key={field.name} className='space-y-2'>
-                  <Input
-                    label={field.label}
-                    name={field.name}
-                    value={formData[field.name]}
-                    onChange={handleChange}
-                    disabled={!editMode[field.name]}
-                    required
-                  />
-
-                  {!editMode[field.name] ? (
-                    <button
-                      type='button'
-                      onClick={() => handleEdit(field.name)}
-                      className='text-sm text-blue-600 underline hover:text-blue-800 transition'
-                    >
-                      Edit
-                    </button>
+                  {loading ? (
+                    <Skeleton height={60} />
                   ) : (
-                    <div className='flex space-x-4'>
-                      <button
-                        type='button'
-                        onClick={() => handleCancel(field.name)}
-                        className='text-sm text-gray-600 underline hover:text-gray-800 transition'
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type='button'
-                        onClick={() => handleSave(field.name)}
-                        className='text-sm text-green-600 underline hover:text-green-800 transition'
-                      >
-                        Save
-                      </button>
-                    </div>
+                    <>
+                      <Input
+                        label={field.label}
+                        name={field.name}
+                        value={formData[field.name]}
+                        onChange={handleChange}
+                        disabled={!editMode[field.name]}
+                        required
+                      />
+
+                      {!editMode[field.name] ? (
+                        <button
+                          type='button'
+                          onClick={() => handleEdit(field.name)}
+                          className='text-sm text-blue-600 underline hover:text-blue-800 transition'
+                        >
+                          Edit
+                        </button>
+                      ) : (
+                        <div className='flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0'>
+                          <button
+                            type='button'
+                            onClick={() => handleCancel(field.name)}
+                            className='text-sm text-gray-600 underline hover:text-gray-800 transition'
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type='button'
+                            onClick={() => handleSave(field.name)}
+                            className='text-sm text-green-600 underline hover:text-green-800 transition'
+                          >
+                            Save
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ))}
@@ -155,4 +160,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default UpdateProfile

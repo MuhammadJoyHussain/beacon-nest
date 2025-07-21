@@ -7,6 +7,8 @@ import dynamic from 'next/dynamic'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import SelectItem from '@/components/ui/SelectItem'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const Vacancies = () => {
   const [search, setSearch] = useState('')
@@ -16,10 +18,6 @@ const Vacancies = () => {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-
-  const LoadingScreen = dynamic(() => import('@/components/Loading'), {
-    ssr: false,
-  })
 
   const fetchVacancies = async () => {
     setLoading(true)
@@ -57,8 +55,6 @@ const Vacancies = () => {
   const handleNext = () => {
     if (page < totalPages) setPage((prev) => prev + 1)
   }
-
-  if (loading) return <LoadingScreen />
 
   return (
     <div className='min-h-screen bg-foundation-primaryLight text-foundation-text'>
@@ -120,8 +116,17 @@ const Vacancies = () => {
           </Select>
         </div>
 
-        {/* Loader / Empty / Jobs */}
-        {vacancies.length === 0 ? (
+        {loading ? (
+          <ul className='space-y-6'>
+            {[...Array(5)].map((_, i) => (
+              <li key={i} className='border rounded-xl p-6 bg-white shadow-sm'>
+                <Skeleton height={24} width={200} />
+                <Skeleton height={20} width={100} className='mt-2' />
+                <Skeleton height={16} width={150} className='mt-1' />
+              </li>
+            ))}
+          </ul>
+        ) : vacancies.length === 0 ? (
           <p className='text-center text-foundation-mutedText text-lg py-10'>
             No vacancies found.
           </p>
@@ -131,7 +136,7 @@ const Vacancies = () => {
               <li
                 key={job._id}
                 className='border border-foundation-border rounded-xl shadow-sm bg-white
-                           hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer'
+                 hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer'
               >
                 <Link href={`/career/${job._id}`} className='block'>
                   <div className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0'>

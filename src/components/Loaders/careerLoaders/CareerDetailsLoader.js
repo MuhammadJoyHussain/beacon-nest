@@ -1,9 +1,9 @@
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
-import Header from './dashboard/Header'
-import Footer from './Footer'
+import Header from '../../dashboard/Header'
+import Footer from '../../Footer'
 
-export default function LoadingScreen() {
+export default function CareerDLodader() {
   return (
     <div className='min-h-screen bg-muted text-primary'>
       <Header />

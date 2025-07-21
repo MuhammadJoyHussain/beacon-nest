@@ -9,15 +9,19 @@ import {
 } from 'recharts'
 import { User, ShieldCheck, FileText, Briefcase, Mail } from 'lucide-react'
 import { motion } from 'framer-motion'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 import api from '@/utils/api'
-import LoadingScreen from '@/components/Loading'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
+import authApi from '@/utils/authApi'
 
 const StatCard = ({
   title,
   value,
   icon: Icon,
+  loading,
   color = 'text-foundation-primary',
 }) => (
   <motion.div
@@ -29,7 +33,9 @@ const StatCard = ({
     </div>
     <div>
       <h4 className='text-sm text-gray-500'>{title}</h4>
-      <p className='text-2xl font-bold'>{value ?? 0}</p>
+      <p className='text-2xl font-bold'>
+        {loading ? <Skeleton width={60} /> : value ?? 0}
+      </p>
     </div>
   </motion.div>
 )
@@ -49,7 +55,7 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('token')
-        const res = await api.get('/admin/stats', {
+        const res = await authApi.get('/admin/stats', {
           headers: { Authorization: `Bearer ${token}` },
         })
         setStats(res.data)
@@ -62,13 +68,10 @@ export default function AdminDashboard() {
     fetchStats()
   }, [])
 
-  if (loading) return <LoadingScreen />
-
   return (
     <div className='flex h-screen bg-gray-100'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
-        <Header />
         <main className='flex-grow overflow-auto p-6 pt-24 space-y-10'>
           <h1 className='text-3xl font-bold text-foundation-primary'>
             Admin Dashboard
@@ -79,45 +82,54 @@ export default function AdminDashboard() {
               title='Total Jobs'
               value={stats?.totalJobs}
               icon={Briefcase}
+              loading={loading}
             />
             <StatCard
               title='Active Jobs'
               value={stats?.activeJobs}
               icon={FileText}
+              loading={loading}
             />
             <StatCard
               title='Applications'
               value={stats?.totalApplications}
               icon={Mail}
+              loading={loading}
             />
             <StatCard
               title='Total Users'
               value={stats?.totalUsers}
               icon={User}
+              loading={loading}
             />
             <StatCard
               title='Regular Users'
               value={stats?.userCount}
               icon={User}
+              loading={loading}
             />
             <StatCard
               title='Admins'
               value={stats?.adminCount}
               icon={ShieldCheck}
+              loading={loading}
             />
           </div>
 
-          {/* Optional: Add chart visualization later */}
           <div className='bg-white p-6 rounded-2xl shadow-md'>
             <h2 className='text-lg font-semibold mb-4'>Application Trends</h2>
-            <ResponsiveContainer width='100%' height={300}>
-              <BarChart data={mockChartData}>
-                <XAxis dataKey='month' />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey='applications' fill='#10B981' />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <Skeleton height={300} />
+            ) : (
+              <ResponsiveContainer width='100%' height={300}>
+                <BarChart data={mockChartData}>
+                  <XAxis dataKey='month' />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey='applications' fill='#10B981' />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </main>
       </div>

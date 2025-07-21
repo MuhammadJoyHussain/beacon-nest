@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import api from '@/utils/api'
 import Header from '@/components/dashboard/Header'
 import { Toaster, toast } from 'react-hot-toast'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
+import authApi from '@/utils/authApi'
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' })
@@ -31,7 +31,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const { data } = await api.post('/auth/login', formData)
+      const { data } = await authApi.post('/auth/login', formData)
 
       localStorage.setItem('token', data.token)
       toast.success('Login successful! Redirecting...')

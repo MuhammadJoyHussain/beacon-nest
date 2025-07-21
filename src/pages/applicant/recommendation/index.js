@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Link from 'next/link'
-import Header from '@/components/dashboard/Header'
 import Sidebar from '@/components/dashboard/Sidebar'
-import dynamic from 'next/dynamic'
-
-const LoadingScreen = dynamic(() => import('@/components/Loading'), {
-  ssr: false,
-})
+import authApi from '@/utils/authApi'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 // Decode JWT token to get user info
 function parseJwt(token) {
@@ -45,12 +42,9 @@ const RecommendationsPage = () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await axios.get(
-        `http://localhost:4000/api/auth/recommend/${userId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      const res = await authApi.get(`/auth/recommend/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       setRecommendedJobs(res.data)
     } catch (err) {
       setError('Failed to fetch recommendations')
@@ -59,40 +53,58 @@ const RecommendationsPage = () => {
     setLoading(false)
   }
 
-  if (loading) return <LoadingScreen />
-
   return (
     <div className='flex h-screen background'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <main className='flex-grow overflow-auto p-6'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
-            <h2>Recommended Jobs for You</h2>
+            <h2 className='text-2xl font-bold text-foundation-primary'>
+              Recommended Jobs for You
+            </h2>
 
             {error && (
               <p className='text-center text-red-500 font-medium'>{error}</p>
             )}
 
             <ul className='space-y-6'>
-              {recommendedJobs.map((job) => (
-                <li
-                  key={job._id}
-                  className='border border-foundation-pale rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer'
-                >
-                  <Link href={`/applicant/recommendation/${job._id}`}>
-                    <div className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0'>
-                      <h3 className=' text-foundation-primary'>{job.title}</h3>
-                      <span className='inline-block bg-foundation-blue text-white font-semibold px-3 py-1 rounded-full text-sm'>
-                        {job.type}
-                      </span>
-                    </div>
-                    <h4 className='text text-foundation-blue pt-2'>
-                      {job.company}
-                    </h4>
-                    <p>{job.location}</p>
-                  </Link>
-                </li>
-              ))}
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <li
+                      key={idx}
+                      className='border border-foundation-pale rounded-xl p-6 bg-white shadow-sm'
+                    >
+                      <Skeleton height={20} width={'60%'} />
+                      <Skeleton
+                        height={18}
+                        width={100}
+                        className='mt-2 rounded-full'
+                      />
+                      <Skeleton height={18} width={'40%'} className='mt-2' />
+                      <Skeleton height={16} width={'30%'} className='mt-1' />
+                    </li>
+                  ))
+                : recommendedJobs.map((job) => (
+                    <li
+                      key={job.job_id}
+                      className='border border-foundation-pale rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer'
+                    >
+                      <Link href={`/applicant/recommendation/${job.job_id}`}>
+                        <div className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0'>
+                          <h3 className='text-foundation-primary'>
+                            {job.title}
+                          </h3>
+                          <span className='inline-block bg-foundation-blue text-white font-semibold px-3 py-1 rounded-full text-sm'>
+                            {job.type}
+                          </span>
+                        </div>
+                        <h4 className='text text-foundation-blue pt-2'>
+                          {job.company}
+                        </h4>
+                        <p>{job.location}</p>
+                      </Link>
+                    </li>
+                  ))}
             </ul>
           </div>
         </main>

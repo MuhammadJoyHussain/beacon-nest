@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import Footer from '@/components/Footer'
 import { FileText, Upload } from 'lucide-react'
+import authApi from '@/utils/authApi'
 
 const Register = () => {
   const { register, handleSubmit, reset, setValue, watch } = useForm({
@@ -146,7 +147,7 @@ const Register = () => {
     }
 
     try {
-      const { data: resData } = await api.post('auth/register', data)
+      const { data: resData } = await authApi.post('auth/register', data)
       localStorage.setItem('token', resData.token)
       toast.success('Registration successful! Redirecting...')
       setTimeout(() => router.push('/profile'), 1500)

@@ -8,7 +8,8 @@ import Button from '@/components/ui/Button'
 import Textarea from '@/components/ui/Textarea'
 import Checkbox from '@/components/ui/Checkbox'
 import { toast, Toaster } from 'react-hot-toast'
-import LoadingScreen from '@/components/Loading'
+import authApi from '@/utils/authApi'
+import ApplyLoader from '@/components/Loaders/careerLoaders/ApplyLoader'
 
 export default function ApplyJob() {
   const router = useRouter()
@@ -33,7 +34,7 @@ export default function ApplyJob() {
       }
 
       try {
-        const { data } = await api.get('/auth/profile', {
+        const { data } = await authApi.get('/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
         setUser(data)
@@ -78,7 +79,8 @@ export default function ApplyJob() {
     }
   }
 
-  if (loading) return <LoadingScreen />
+  if (loading) return <ApplyLoader />
+
   if (!user) return null
 
   return (

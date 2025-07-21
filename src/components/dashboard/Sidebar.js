@@ -59,6 +59,8 @@ const Sidebar = () => {
 
   const menuItems = role === 'admin' ? adminMenuItems : userMenuItems
 
+  if (role === null) return null
+
   return (
     <div>
       {/* Mobile Toggle Button */}

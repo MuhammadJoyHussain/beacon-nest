@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react'
 import Footer from '@/components/Footer'
 import Button from '@/components/ui/Button'
 import dynamic from 'next/dynamic'
+import ApplyLoader from '@/components/Loaders/careerLoaders/CareerDetailsLoader'
+import CareerDLodader from '@/components/Loaders/careerLoaders/CareerDetailsLoader'
 
 const VacancyDetail = () => {
   const router = useRouter()
@@ -12,10 +14,6 @@ const VacancyDetail = () => {
 
   const [vacancy, setVacancy] = useState(null)
   const [loading, setLoading] = useState(true)
-
-  const LoadingScreen = dynamic(() => import('@/components/Loading'), {
-    ssr: false,
-  })
 
   useEffect(() => {
     if (!router.isReady || !id) return
@@ -32,7 +30,7 @@ const VacancyDetail = () => {
     fetchVacancy()
   }, [router.isReady, id])
 
-  if (loading) return <LoadingScreen />
+  if (loading) return <CareerDLodader />
 
   if (!vacancy) {
     return (

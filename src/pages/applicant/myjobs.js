@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 import api from '@/utils/api'
-import dynamic from 'next/dynamic'
-
-const LoadingScreen = dynamic(() => import('@/components/Loading'), {
-  ssr: false,
-})
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const Joblist = () => {
   const [appliedJobs, setAppliedJobs] = useState([])
@@ -48,21 +45,37 @@ const Joblist = () => {
     fetchApplications()
   }, [])
 
-  if (loading) return <LoadingScreen />
-
   return (
     <div className='flex h-screen bg-foundation-background'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <main className='flex-grow overflow-auto p-6'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
-            <h2>My Applications</h2>
+            <h2 className='text-2xl font-bold'>My Applications</h2>
 
             {error && (
               <div className='text-center text-red-500 text-lg'>{error}</div>
             )}
 
-            {appliedJobs.length === 0 ? (
+            {loading ? (
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className='bg-foundation-pale rounded-xl p-6 shadow-sm'
+                  >
+                    <Skeleton height={20} width={'60%'} />
+                    <Skeleton height={20} width={'40%'} className='mt-2' />
+                    <Skeleton height={16} width={'50%'} className='mt-4' />
+                    <Skeleton
+                      height={28}
+                      width={100}
+                      className='mt-6 rounded-full'
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : appliedJobs.length === 0 ? (
               <div className='text-center text-foundation-softblue text-lg py-10'>
                 You haven’t applied for any jobs yet.
               </div>
