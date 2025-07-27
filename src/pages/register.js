@@ -14,7 +14,14 @@ import { FileText, Upload } from 'lucide-react'
 import authApi from '@/utils/authApi'
 
 const Register = () => {
-  const { register, handleSubmit, reset, setValue, watch } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -26,7 +33,16 @@ const Register = () => {
       city: '',
       postcode: '',
       country: '',
-      position: '',
+      employeeExperience: [
+        {
+          position: '',
+          company: '',
+          startDate: '',
+          endDate: '',
+          city: '',
+          country: '',
+        },
+      ],
       company: '',
       startDate: '',
       endDate: '',
@@ -38,6 +54,7 @@ const Register = () => {
       shareCode: '',
       terms: false,
       gdpr: false,
+      skills: [''], // start with one skill input
     },
   })
 
@@ -54,7 +71,7 @@ const Register = () => {
     'Germany',
   ]
 
-  // Define input fields for each section
+  // Fields arrays for easier map rendering
   const personalFields = [
     { name: 'firstName', placeholder: 'First Name*' },
     { name: 'lastName', placeholder: 'Last Name*' },
@@ -97,11 +114,7 @@ const Register = () => {
     { name: 'gdpr', label: 'GDPR*', href: '/gdpr' },
   ]
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setValue(name, type === 'checkbox' ? checked : value)
-  }
-
+  // Handle file upload and extract form data from API
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0]
     setFile(selectedFile)
@@ -116,26 +129,79 @@ const Register = () => {
       toast.success('PDF uploaded, form data extracted!')
 
       const data = res.data
+      console.log(data.employeeExperience)
+
       if (data.employeeExperience && data.employeeExperience.length > 0) {
         const exp = data.employeeExperience[0]
-        setValue('position', exp.position || '')
-        setValue('company', exp.company || '')
-        setValue('startDate', exp.startDate || '')
-        setValue(
-          'endDate',
-          exp.endDate?.includes('undefined') ? '' : exp.endDate || ''
-        )
-        setValue('expCity', exp.city || '')
-        setValue('expCountry', exp.country || '')
+        setValue('employeeExperience', [
+          {
+            position: exp.position || '',
+            company: exp.company || '',
+            startDate: exp.startDate || '',
+            endDate: exp.endDate?.includes('undefined')
+              ? ''
+              : exp.endDate || '',
+            city: exp.city || '',
+            country: exp.country || '',
+          },
+        ])
       }
 
       reset({ ...formData, ...data })
+
+      console.log(data)
     } catch (error) {
       console.error('Upload error:', error)
       toast.error(error.response?.data?.message || 'Error uploading PDF')
     }
   }
 
+  // Additional handlers for experience section
+  const addExperience = () => {
+    setValue('employeeExperience', [
+      ...formData.employeeExperience,
+      {
+        position: '',
+        company: '',
+        startDate: '',
+        endDate: '',
+        city: '',
+        country: '',
+      },
+    ])
+  }
+
+  const removeExperience = (index) => {
+    const updated = [...formData.employeeExperience]
+    updated.splice(index, 1)
+    setValue('employeeExperience', updated)
+  }
+
+  const handleExperienceChange = (e, index, field) => {
+    const updated = [...formData.employeeExperience]
+    updated[index][field] = e.target.value
+    setValue('employeeExperience', updated)
+  }
+
+  // Skills management handlers
+  const addSkill = () => {
+    setValue('skills', [...formData.skills, ''])
+  }
+
+  const removeSkill = (index) => {
+    if (formData.skills.length <= 1) return // Don't remove if only one skill left
+    const updated = [...formData.skills]
+    updated.splice(index, 1)
+    setValue('skills', updated)
+  }
+
+  const handleSkillChange = (e, index) => {
+    const updated = [...formData.skills]
+    updated[index] = e.target.value
+    setValue('skills', updated)
+  }
+
+  // Submit handler
   const onSubmit = async (data) => {
     if (!data.terms || !data.gdpr) {
       toast.error('Please agree to Terms & Conditions and GDPR policy.')
@@ -155,6 +221,95 @@ const Register = () => {
       toast.error(err.response?.data?.message || 'Registration failed')
     }
   }
+  const formatToUKDate = (dateStr) => {
+    const date = new Date(dateStr)
+    return !isNaN(date) ? date.toISOString().split('T')[0] : ''
+  }
+
+  // Replace your Experience section with this function call
+  function renderExperienceFields() {
+    return (
+      <section className='space-y-6'>
+        <h3 className='text-xl font-semibold mb-4'>Experience</h3>
+        {formData.employeeExperience.map((exp, index) => (
+          <div
+            key={index}
+            className='grid md:grid-cols-2 gap-6 mb-4 p-4 rounded-xl'
+          >
+            <Input
+              label='Position*'
+              value={exp.position}
+              onChange={(e) => handleExperienceChange(e, index, 'position')}
+              {...register(`employeeExperience.${index}.position`)}
+              placeholder='Position'
+            />
+            <Input
+              label='Company*'
+              value={exp.company}
+              onChange={(e) => handleExperienceChange(e, index, 'company')}
+              {...register(`employeeExperience.${index}.company`)}
+              placeholder='Company'
+            />
+            <Input
+              label='Start Date*'
+              type='date'
+              value={formatToUKDate(exp.startDate)}
+              onChange={(e) => handleExperienceChange(e, index, 'startDate')}
+              {...register(`employeeExperience.${index}.startDate`)}
+            />
+            {
+              // If endDate is a date, show date input. If it's text like "Present", show text input
+              isNaN(new Date(exp.endDate)) ? (
+                <Input
+                  label='End Date'
+                  type='text'
+                  value={exp.endDate}
+                  onChange={(e) => handleExperienceChange(e, index, 'endDate')}
+                  {...register(`employeeExperience.${index}.endDate`)}
+                />
+              ) : (
+                <Input
+                  label='End Date'
+                  type='date'
+                  value={formatToUKDate(exp.endDate)}
+                  onChange={(e) => handleExperienceChange(e, index, 'endDate')}
+                  {...register(`employeeExperience.${index}.endDate`)}
+                />
+              )
+            }
+            <Input
+              label='City'
+              value={exp.city}
+              onChange={(e) => handleExperienceChange(e, index, 'city')}
+              {...register(`employeeExperience.${index}.city`)}
+              placeholder='City'
+            />
+            <Input
+              label='Country'
+              value={exp.country}
+              onChange={(e) => handleExperienceChange(e, index, 'country')}
+              {...register(`employeeExperience.${index}.country`)}
+              placeholder='Country'
+            />
+            {formData.employeeExperience.length > 1 && (
+              <div className='md:col-span-2 text-right'>
+                <button
+                  type='button'
+                  onClick={() => removeExperience(index)}
+                  className='text-red-500'
+                >
+                  ✕ Remove Experience
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+        <Button type='button' onClick={addExperience} className='mt-2'>
+          + Add Experience
+        </Button>
+      </section>
+    )
+  }
 
   return (
     <div className='min-h-screen background text-[#3D52A0]'>
@@ -164,20 +319,25 @@ const Register = () => {
           onSubmit={handleSubmit(onSubmit)}
           className='max-w-4xl bg-white mx-auto shadow-xl rounded-3xl p-10 space-y-10'
         >
-          <h2>Employee Registration</h2>
+          <h2 className='text-2xl font-semibold mb-8'>Employee Registration</h2>
 
-          {/* Upload */}
+          {/* Upload CV Section */}
           <section className='space-y-4'>
             <h3 className='text-xl font-semibold text-[#3D52A0]'>Upload CV</h3>
 
-            <div className='relative w-full bg-[#F3F4FA] border border-[#ADBBDA] rounded-2xl p-6 flex items-center justify-between hover:shadow-md transition-shadow'>
+            <label
+              htmlFor='cv-upload'
+              className='relative w-full cursor-pointer bg-[#F3F4FA] border border-[#ADBBDA] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 hover:shadow-md transition-shadow'
+            >
               <div className='flex items-center gap-4'>
                 <div className='bg-[#7091E6] p-3 rounded-xl'>
-                  <FileText className='text-white w-6 h-6' />
+                  <FileText className='text-white w-6 h-6 sm:w-7 sm:h-7' />
                 </div>
                 <div>
-                  <p className='text-sm font-medium text-[#3D52A0]'>
-                    {file ? file.name : 'No file selected'}
+                  <p className='text-sm font-medium text-[#3D52A0] truncate max-w-xs sm:max-w-md'>
+                    {file
+                      ? file.name
+                      : 'Click here or drag and drop a PDF file'}
                   </p>
                   <p className='text-xs text-gray-500'>
                     Upload only PDF format. Max size 5MB.
@@ -185,26 +345,20 @@ const Register = () => {
                 </div>
               </div>
 
-              <label
-                htmlFor='cv-upload'
-                className='inline-flex items-center gap-2 text-sm text-white bg-[#7091E6] px-4 py-2 rounded-lg cursor-pointer hover:bg-[#3D52A0] transition-colors'
-              >
-                <Upload className='w-4 h-4' />
-                Upload
-                <input
-                  id='cv-upload'
-                  type='file'
-                  accept='application/pdf'
-                  onChange={handleFileChange}
-                  className='hidden'
-                />
-              </label>
-            </div>
+              {/* Hidden input */}
+              <input
+                id='cv-upload'
+                type='file'
+                accept='application/pdf'
+                onChange={handleFileChange}
+                className='hidden'
+              />
+            </label>
           </section>
 
           {/* Personal Details */}
           <section className='space-y-6'>
-            <h3>Personal Details</h3>
+            <h3 className='text-xl font-semibold mb-4'>Personal Details</h3>
             <div className='grid md:grid-cols-2 gap-6'>
               {personalFields.map(({ name, placeholder, type }) => (
                 <Input
@@ -212,42 +366,44 @@ const Register = () => {
                   label={placeholder}
                   name={name}
                   type={type || 'text'}
-                  placeholder={placeholder}
-                  register={register}
                   value={formData[name]}
-                  onChange={handleChange}
+                  placeholder={placeholder}
+                  {...register(name, { required: placeholder.endsWith('*') })}
+                  error={errors[name]}
                 />
               ))}
               <Select
+                label='Gender'
                 name='gender'
                 {...register('gender')}
                 value={formData.gender}
-                onChange={handleChange}
+                onChange={(e) => setValue('gender', e.target.value)}
+                className='w-full'
               >
-                <option value=''>Select Gender*</option>
-                {genders.map((gen) => (
-                  <SelectItem key={gen} value={gen}>
-                    {gen}
-                  </SelectItem>
+                <option value=''>Select Gender</option>
+                {genders.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
                 ))}
               </Select>
             </div>
           </section>
 
-          {/* Contact Information */}
+          {/* Contact Details */}
           <section className='space-y-6'>
-            <h3>Contact Information</h3>
+            <h3 className='text-xl font-semibold mb-4'>Contact Details</h3>
             <div className='grid md:grid-cols-2 gap-6'>
               {contactFields.map(({ name, placeholder, type }) => (
                 <Input
                   key={name}
-                  name={name}
                   label={placeholder}
+                  value={formData[name]}
+                  name={name}
                   type={type || 'text'}
                   placeholder={placeholder}
-                  register={register}
-                  value={formData[name]}
-                  onChange={handleChange}
+                  {...register(name, { required: placeholder.endsWith('*') })}
+                  error={errors[name]}
                 />
               ))}
             </div>
@@ -255,137 +411,132 @@ const Register = () => {
 
           {/* Address */}
           <section className='space-y-6'>
-            <h3>Address</h3>
+            <h3 className='text-xl font-semibold mb-4'>Address</h3>
             <div className='grid md:grid-cols-2 gap-6'>
-              {addressFields.map(({ name, placeholder }) => (
+              {addressFields.map(({ name, placeholder, type }) => (
                 <Input
                   key={name}
-                  name={name}
                   label={placeholder}
-                  placeholder={placeholder}
-                  register={register}
+                  name={name}
                   value={formData[name]}
-                  onChange={handleChange}
+                  type={type || 'text'}
+                  placeholder={placeholder}
+                  {...register(name, { required: placeholder.endsWith('*') })}
+                  error={errors[name]}
                 />
               ))}
               <Select
-                className='pt-6'
+                label='Country'
                 name='country'
-                register={register}
+                {...register('country')}
                 value={formData.country}
-                onChange={handleChange}
+                onChange={(e) => setValue('country', e.target.value)}
+                className='w-full'
               >
-                <option value=''>Select Country*</option>
-                {countries.map((country) => (
-                  <SelectItem key={country} value={country}>
-                    {country}
-                  </SelectItem>
+                <option value=''>Select Country</option>
+                {countries.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </Select>
             </div>
           </section>
 
-          {/* Employee Experience */}
-          <section className='space-y-6'>
-            <h3>Employee Experience</h3>
-            <div className='grid md:grid-cols-2 gap-6'>
-              {experienceFields.slice(0, 2).map(({ name, placeholder }) => (
-                <Input
-                  key={name}
-                  name={name}
-                  placeholder={placeholder}
-                  register={register}
-                  value={formData[name]}
-                  onChange={handleChange}
-                />
-              ))}
-            </div>
-            <div className='grid md:grid-cols-2 gap-6'>
-              {experienceFields
-                .slice(2, 4)
-                .map(({ name, placeholder, type }) => (
-                  <Input
-                    key={name}
-                    name={name}
-                    placeholder={placeholder}
-                    type={type || 'text'}
-                    register={register}
-                    value={formData[name]}
-                    onChange={handleChange}
-                  />
-                ))}
-            </div>
-            <div className='grid md:grid-cols-2 gap-6'>
-              {experienceFields.slice(4).map(({ name, placeholder }) => (
-                <Input
-                  key={name}
-                  name={name}
-                  placeholder={placeholder}
-                  register={register}
-                  value={formData[name]}
-                  onChange={handleChange}
-                />
-              ))}
-            </div>
-          </section>
+          {/* Experience */}
 
-          {/* Account Setup */}
+          {renderExperienceFields()}
+
+          {/* Skills (Dynamic Inputs) */}
+          {renderSkillsField()}
+
+          {/* Account Details */}
           <section className='space-y-6'>
-            <h3 className='text-2xl font-semibold text-[#7091E6]'>
-              Account Setup
-            </h3>
+            <h3 className='text-xl font-semibold mb-4'>Account Details</h3>
             <div className='grid md:grid-cols-2 gap-6'>
-              {accountFields.slice(0, 1).map(({ name, placeholder }) => (
+              {accountFields.map(({ name, placeholder, type }) => (
                 <Input
                   key={name}
+                  label={placeholder}
                   name={name}
-                  placeholder={placeholder}
-                  register={register}
-                  value={formData[name]}
-                  onChange={handleChange}
-                />
-              ))}
-            </div>
-            <div className='grid md:grid-cols-2 gap-6'>
-              {accountFields.slice(1).map(({ name, placeholder, type }) => (
-                <Input
-                  key={name}
-                  name={name}
-                  placeholder={placeholder}
                   type={type || 'text'}
-                  register={register}
-                  value={formData[name]}
-                  onChange={handleChange}
+                  placeholder={placeholder}
+                  {...register(name, { required: placeholder.endsWith('*') })}
+                  error={errors[name]}
                 />
               ))}
             </div>
           </section>
 
-          {/* Terms & Privacy */}
-          <section className='space-y-3'>
+          {/* Policies */}
+          <section>
             {policyFields.map(({ name, label, href }) => (
-              <label className='flex items-center space-x-3'>
+              <div className='flex'>
                 <Checkbox
+                  key={name}
+                  label={
+                    <>
+                      I agree to{' '}
+                      <a
+                        href={href}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 underline'
+                      >
+                        {label}
+                      </a>
+                    </>
+                  }
                   name={name}
-                  checked={formData.name}
-                  onChange={handleChange}
+                  {...register(name, { required: true })}
+                  error={errors[name]}
                 />
-                <span>
-                  I agree to the{' '}
-                  <a href={href} className='underline text-[#3D52A0]'>
-                    {label}
-                  </a>
-                </span>
-              </label>
+              </div>
             ))}
           </section>
 
-          <Button type='submit'>Register</Button>
+          <Button type='submit' className='w-full'>
+            Register
+          </Button>
         </form>
       </div>
       <Footer />
     </div>
   )
+
+  // Render Skills Field inside component to access formData etc.
+  function renderSkillsField() {
+    return (
+      <section className='space-y-6'>
+        <h3 className='text-xl font-semibold mb-4'>Skills</h3>
+        {formData.skills.map((skill, index) => (
+          <div key={index} className='flex items-center gap-2 mb-2'>
+            <Input
+              {...register(`skills.${index}`)}
+              value={skill}
+              label={'eg.. React, HTML, JavaScript'}
+              onChange={(e) => handleSkillChange(e, index)}
+              className='flex-1'
+              placeholder='Enter skill'
+            />
+            {formData.skills.length > 1 && (
+              <button
+                type='button'
+                onClick={() => removeSkill(index)}
+                className='text-red-500 font-bold text-lg px-2'
+                aria-label='Remove skill'
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        ))}
+        <Button type='button' onClick={addSkill} className='mt-1'>
+          + Add Skill
+        </Button>
+      </section>
+    )
+  }
 }
 
 export default Register
