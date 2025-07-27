@@ -13,6 +13,10 @@ const ApplicationDetails = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const [skillGap, setSkillGap] = useState([])
+  const [course, setCourse] = useState([])
+  const [skillLoading, setSkillLoading] = useState(false)
+
   useEffect(() => {
     const fetchApplication = async () => {
       try {
@@ -32,116 +36,240 @@ const ApplicationDetails = () => {
     if (id) fetchApplication()
   }, [id])
 
+  useEffect(() => {
+    const fetchSkillGap = async () => {
+      if (!id) return
+      setSkillLoading(true)
+      try {
+        const token = localStorage.getItem('token')
+        const { data } = await api.get(`/application/${id}/skill-gap`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        setSkillGap(data.skillGap)
+      } catch (err) {
+        console.error('Error fetching skill gap:', err)
+      } finally {
+        setSkillLoading(false)
+      }
+    }
+
+    fetchSkillGap()
+  }, [id])
+
+  useEffect(() => {
+    if (skillGap.length === 0) return
+    setSkillLoading(true)
+    const fetchCourses = async () => {
+      try {
+        const query = skillGap.map((s) => s.toLowerCase()).join(',')
+        const { data } = await api.get(`/course?skills=${query}`)
+        setCourse(data)
+      } catch (err) {
+        console.error('Error fetching course:', err)
+      } finally {
+        setSkillLoading(false)
+      }
+    }
+
+    fetchCourses()
+  }, [skillGap])
+
   return (
-    <div className='flex h-screen bg-foundation-background'>
+    <div className='flex h-screen bg-gray-50'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
-        <main className='flex-grow overflow-auto p-6'>
-          <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
-            <h2 className='text-2xl font-bold'>Application Details</h2>
+        <main className='flex-grow overflow-auto p-8'>
+          <div className='max-w-6xl mx-auto bg-white shadow-lg rounded-3xl p-12 space-y-10'>
+            <h2 className='text-2xl font-bold text-foundation-primary mb-8 border-b-2 border-foundation-blue pb-4'>
+              Application Details
+            </h2>
 
             {loading ? (
-              <Skeleton count={10} />
+              <Skeleton count={10} height={25} />
             ) : error ? (
-              <p className='text-red-500'>{error}</p>
+              <h5 className='text-red-500 font-semibold text-center'>
+                {error}
+              </h5>
             ) : (
-              <div className='space-y-6'>
-                <div>
-                  <h3 className='text-lg font-semibold'>Job Information</h3>
-                  <p>
-                    <strong>Title:</strong> {application.job.title}
-                  </p>
-                  <p>
+              <div className='space-y-10'>
+                {/* Job Info */}
+                <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                  <h3 className='mb-4 border-b text-foundation-primary border-foundation-blue pb-2'>
+                    Job Information
+                  </h3>
+                  <h5 className='text-foundation-primary'>
+                    <strong className='text-semibold'>Title:</strong>{' '}
+                    {application.job.title}
+                  </h5>
+                  <h5 className='text-foundation-primary'>
                     <strong>Company:</strong> {application.job.company}
-                  </p>
-                  <p>
+                  </h5>
+                  <h5 className='mt-2'>
                     <strong>Status:</strong>{' '}
-                    <span className='text-sm px-2 py-1 bg-foundation-blue text-white rounded-full'>
+                    <span className='inline-block text-sm px-3 py-1 rounded-full bg-foundation-blue text-white font-semibold'>
                       {application.status}
                     </span>
-                  </p>
-                </div>
+                  </h5>
+                </section>
 
-                <div>
-                  <h3 className='text-lg font-semibold'>Applicant Info</h3>
-                  <p>
+                {/* Applicant Info */}
+                <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                    Applicant Info
+                  </h3>
+                  <h5 className='text-foundation-primary'>
                     <strong>Name:</strong> {application.fullName}
-                  </p>
-                  <p>
+                  </h5>
+                  <h5 className='text-foundation-primary'>
                     <strong>Email:</strong> {application.email}
-                  </p>
-                  <p>
+                  </h5>
+                  <h5 className='text-foundation-primary'>
                     <strong>Phone:</strong> {application.phone}
-                  </p>
-                </div>
+                  </h5>
+                </section>
 
-                <div>
-                  <h3 className='text-lg font-semibold'>Details</h3>
-                  <p>
+                {/* Additional Details */}
+                <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                    Details
+                  </h3>
+                  <h5>
                     <strong>Experience Years:</strong>{' '}
                     {application.experienceYears}
-                  </p>
-                  <p>
+                  </h5>
+                  <h5>
                     <strong>Expected Salary:</strong>{' '}
                     {application.expectedSalary}
-                  </p>
-                  <p>
-                    <strong>Start Date:</strong> {application.startDate}
-                  </p>
-                  <p>
+                  </h5>
+                  <h5>
+                    <strong>Start Date:</strong>{' '}
+                    {new Date(application.startDate).toLocaleDateString(
+                      'en-UK',
+                      {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      }
+                    )}
+                  </h5>
+                  <h5>
                     <strong>LinkedIn:</strong>{' '}
                     <a
                       href={application.linkedIn}
-                      className='text-blue-500 underline'
+                      className='text-foundation-primary underline hover:text-foundation-blue'
                       target='_blank'
                       rel='noopener noreferrer'
                     >
                       Profile Link
                     </a>
-                  </p>
-                  <p>
+                  </h5>
+                  <h5>
                     <strong>Authorized to work:</strong>{' '}
                     {application.authorized ? 'Yes' : 'No'}
-                  </p>
-                </div>
+                  </h5>
+                </section>
 
-                <div>
-                  <h3 className='text-lg font-semibold'>Cover Letter</h3>
-                  <p className='bg-foundation-pale p-4 rounded-md whitespace-pre-wrap'>
-                    {application.coverLetter}
-                  </p>
-                </div>
+                {/* Cover Letter */}
+                <section className='bg-gray-100 rounded-2xl p-6 shadow-sm whitespace-pre-wrap'>
+                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                    Cover Letter
+                  </h3>
+                  <h5>{application.coverLetter}</h5>
+                </section>
 
+                {/* Additional Info */}
                 {application.additionalInfo && (
-                  <div>
-                    <h3 className='text-lg font-semibold'>Additional Info</h3>
-                    <p className='bg-foundation-pale p-4 rounded-md whitespace-pre-wrap'>
-                      {application.additionalInfo}
-                    </p>
-                  </div>
+                  <section className='bg-gray-100 rounded-2xl p-6 shadow-sm whitespace-pre-wrap'>
+                    <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                      Additional Info
+                    </h3>
+                    <h5>{application.additionalInfo}</h5>
+                  </section>
                 )}
 
-                <div>
-                  <h3 className='text-lg font-semibold'>Uploaded CV</h3>
+                {/* CV */}
+                <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                    Uploaded CV
+                  </h3>
                   {application.cv ? (
                     <a
                       href={application.cv}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-blue-600 underline'
+                      className='text-foundation-primary underline font-semibold hover:text-foundation-softblue'
                     >
                       View CV
                     </a>
                   ) : (
-                    <p>No CV uploaded.</p>
+                    <h5 className='text-gray-700'>No CV uploaded.</h5>
                   )}
-                </div>
+                </section>
 
+                {/* Skill Gap */}
+                <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                    Skill Gap Analysis
+                  </h3>
+                  {skillLoading ? (
+                    <h5 className='text-gray-700 font-medium'>
+                      Checking skills...
+                    </h5>
+                  ) : skillGap.length > 0 ? (
+                    <ul className='list-disc ml-6 text-red-400 font-semibold'>
+                      {skillGap.map((skill, index) => (
+                        <li key={index}>{skill}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <h5>✅ You meet all the skill requirements!</h5>
+                  )}
+                </section>
+
+                {/* Recommended Courses */}
+                {course.length > 0 && (
+                  <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                    <h3 className=' font-semibold text-foundation-primary mb-6 border-b border-foundation-blue pb-3'>
+                      📚 Recommended Courses
+                    </h3>
+                    {course.map(({ _id, skill, courses }) => (
+                      <div key={_id} className='mb-6'>
+                        <h4 className='text-lg font-semibold text-foundation-primary mb-3 capitalize border-b pb-2'>
+                          {skill} courses
+                        </h4>
+                        <ul className='space-y-4 ml-4'>
+                          {courses.map(
+                            ({ _id: courseId, title, url, provider }) => (
+                              <li
+                                key={courseId}
+                                className='p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                              >
+                                <a
+                                  href={url}
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                  className='text-foundation-primary font-semibold underline hover:text-foundation-blue'
+                                >
+                                  {title}
+                                </a>
+                                <h5 className='text-gray-600 text-sm mt-1'>
+                                  Provider: {provider}
+                                </h5>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                  </section>
+                )}
+
+                {/* CV Enhancer Placeholder */}
                 <button
                   onClick={() =>
                     alert('This will trigger the CV enhancement feature (TBD)')
                   }
-                  className='mt-4 px-5 py-2 bg-primary text-white rounded hover:bg-primary-dark transition'
+                  className='mt-8 px-6 py-3 bg-foundation-primary text-white font-semibold rounded-xl hover:bg-foundation-blue transition'
                 >
                   Enhance My CV
                 </button>

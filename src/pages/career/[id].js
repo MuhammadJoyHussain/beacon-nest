@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react'
 import Footer from '@/components/Footer'
 import Button from '@/components/ui/Button'
 import dynamic from 'next/dynamic'
-import ApplyLoader from '@/components/Loaders/careerLoaders/CareerDetailsLoader'
 import CareerDLodader from '@/components/Loaders/careerLoaders/CareerDetailsLoader'
 
 const VacancyDetail = () => {
@@ -45,9 +44,7 @@ const VacancyDetail = () => {
       <Header />
       <main className='max-w-4xl mx-auto px-6 pt-24 pb-10'>
         <div className='bg-white rounded-xl shadow-md p-8'>
-          <h1 className='text-3xl font-bold text-primary mb-4'>
-            {vacancy.title}
-          </h1>
+          <h2 className='font-bold'>{vacancy.title}</h2>
 
           <div className='space-y-2 mb-6 text-muted-foreground'>
             <p>

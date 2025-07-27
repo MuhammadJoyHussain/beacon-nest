@@ -22,8 +22,12 @@ h4 {
   @apply text-xl font-semibold mb-2 text-white;
 }
 
+h5 {
+  @apply text-lg font-semibold text-foundation-primary;
+}
+
 p {
-  @apply text-lg md:text-xl text-[#8697C4];
+  @apply text-lg md:text-xl text-[#52669e];
 }
 
 .pro-pic {

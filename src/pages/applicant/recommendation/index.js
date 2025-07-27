@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import Link from 'next/link'
 import Sidebar from '@/components/dashboard/Sidebar'
 import authApi from '@/utils/authApi'
