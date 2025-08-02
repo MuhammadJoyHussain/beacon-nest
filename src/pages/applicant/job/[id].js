@@ -18,6 +18,7 @@ const ApplicationDetails = () => {
   const [skillLoading, setSkillLoading] = useState(false)
 
   useEffect(() => {
+    if (!id) return
     const fetchApplication = async () => {
       try {
         const token = localStorage.getItem('token')
@@ -26,19 +27,18 @@ const ApplicationDetails = () => {
         })
         setApplication(data)
       } catch (err) {
-        console.error(err)
         setError('Application not found or unauthorized.')
       } finally {
         setLoading(false)
       }
     }
 
-    if (id) fetchApplication()
+    fetchApplication()
   }, [id])
 
   useEffect(() => {
+    if (!id) return
     const fetchSkillGap = async () => {
-      if (!id) return
       setSkillLoading(true)
       try {
         const token = localStorage.getItem('token')
@@ -58,8 +58,8 @@ const ApplicationDetails = () => {
 
   useEffect(() => {
     if (skillGap.length === 0) return
-    setSkillLoading(true)
     const fetchCourses = async () => {
+      setSkillLoading(true)
       try {
         const query = skillGap.map((s) => s.toLowerCase()).join(',')
         const { data } = await api.get(`/course?skills=${query}`)
@@ -97,12 +97,11 @@ const ApplicationDetails = () => {
                   <h3 className='mb-4 border-b text-foundation-primary border-foundation-blue pb-2'>
                     Job Information
                   </h3>
-                  <h5 className='text-foundation-primary'>
-                    <strong className='text-semibold'>Title:</strong>{' '}
-                    {application.job.title}
+                  <h5>
+                    <strong>Title:</strong> {application.job?.title}
                   </h5>
-                  <h5 className='text-foundation-primary'>
-                    <strong>Company:</strong> {application.job.company}
+                  <h5>
+                    <strong>Company:</strong> {application.job?.company}
                   </h5>
                   <h5 className='mt-2'>
                     <strong>Status:</strong>{' '}
@@ -114,23 +113,23 @@ const ApplicationDetails = () => {
 
                 {/* Applicant Info */}
                 <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
-                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                  <h3 className='font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
                     Applicant Info
                   </h3>
-                  <h5 className='text-foundation-primary'>
+                  <h5>
                     <strong>Name:</strong> {application.fullName}
                   </h5>
-                  <h5 className='text-foundation-primary'>
+                  <h5>
                     <strong>Email:</strong> {application.email}
                   </h5>
-                  <h5 className='text-foundation-primary'>
+                  <h5>
                     <strong>Phone:</strong> {application.phone}
                   </h5>
                 </section>
 
-                {/* Additional Details */}
+                {/* Details */}
                 <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
-                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                  <h3 className='font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
                     Details
                   </h3>
                   <h5>
@@ -152,17 +151,19 @@ const ApplicationDetails = () => {
                       }
                     )}
                   </h5>
-                  <h5>
-                    <strong>LinkedIn:</strong>{' '}
-                    <a
-                      href={application.linkedIn}
-                      className='text-foundation-primary underline hover:text-foundation-blue'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    >
-                      Profile Link
-                    </a>
-                  </h5>
+                  {application.linkedIn && (
+                    <h5>
+                      <strong>LinkedIn:</strong>{' '}
+                      <a
+                        href={application.linkedIn}
+                        className='text-foundation-primary underline hover:text-foundation-blue'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        Profile Link
+                      </a>
+                    </h5>
+                  )}
                   <h5>
                     <strong>Authorized to work:</strong>{' '}
                     {application.authorized ? 'Yes' : 'No'}
@@ -171,7 +172,7 @@ const ApplicationDetails = () => {
 
                 {/* Cover Letter */}
                 <section className='bg-gray-100 rounded-2xl p-6 shadow-sm whitespace-pre-wrap'>
-                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                  <h3 className='font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
                     Cover Letter
                   </h3>
                   <h5>{application.coverLetter}</h5>
@@ -180,7 +181,7 @@ const ApplicationDetails = () => {
                 {/* Additional Info */}
                 {application.additionalInfo && (
                   <section className='bg-gray-100 rounded-2xl p-6 shadow-sm whitespace-pre-wrap'>
-                    <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                    <h3 className='font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
                       Additional Info
                     </h3>
                     <h5>{application.additionalInfo}</h5>
@@ -189,7 +190,7 @@ const ApplicationDetails = () => {
 
                 {/* CV */}
                 <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
-                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                  <h3 className='font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
                     Uploaded CV
                   </h3>
                   {application.cv ? (
@@ -208,7 +209,7 @@ const ApplicationDetails = () => {
 
                 {/* Skill Gap */}
                 <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
-                  <h3 className=' font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
+                  <h3 className='font-semibold text-foundation-primary mb-4 border-b border-foundation-blue pb-2'>
                     Skill Gap Analysis
                   </h3>
                   {skillLoading ? (
@@ -222,20 +223,20 @@ const ApplicationDetails = () => {
                       ))}
                     </ul>
                   ) : (
-                    <h5>✅ You meet all the skill requirements!</h5>
+                    <h5>You meet all the skill requirements!</h5>
                   )}
                 </section>
 
                 {/* Recommended Courses */}
                 {course.length > 0 && (
                   <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
-                    <h3 className=' font-semibold text-foundation-primary mb-6 border-b border-foundation-blue pb-3'>
-                      📚 Recommended Courses
+                    <h3 className='font-semibold text-foundation-primary mb-6 border-b border-foundation-blue pb-3'>
+                      Recommended Courses
                     </h3>
                     {course.map(({ _id, skill, courses }) => (
                       <div key={_id} className='mb-6'>
                         <h4 className='text-lg font-semibold text-foundation-primary mb-3 capitalize border-b pb-2'>
-                          {skill} courses
+                          {skill} Courses
                         </h4>
                         <ul className='space-y-4 ml-4'>
                           {courses.map(
@@ -264,15 +265,7 @@ const ApplicationDetails = () => {
                   </section>
                 )}
 
-                {/* CV Enhancer Placeholder */}
-                <button
-                  onClick={() =>
-                    alert('This will trigger the CV enhancement feature (TBD)')
-                  }
-                  className='mt-8 px-6 py-3 bg-foundation-primary text-white font-semibold rounded-xl hover:bg-foundation-blue transition'
-                >
-                  Enhance My CV
-                </button>
+                {/* CV Enhancer Button */}
               </div>
             )}
           </div>

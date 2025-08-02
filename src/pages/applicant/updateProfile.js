@@ -16,6 +16,7 @@ const UpdateProfile = () => {
     postcode: '',
     country: '',
     shareCode: '',
+    skills: '', // ➕ Added skills
   })
 
   const [originalData, setOriginalData] = useState({})
@@ -40,6 +41,7 @@ const UpdateProfile = () => {
           postcode: data.postcode || '',
           country: data.country || '',
           shareCode: data.shareCode || '',
+          skills: data.skills || '', // ➕ Added skills
         }
 
         setFormData(cleaned)
@@ -107,6 +109,7 @@ const UpdateProfile = () => {
                 { name: 'postcode', label: 'Postcode' },
                 { name: 'country', label: 'Country' },
                 { name: 'shareCode', label: 'Share Code' },
+                { name: 'skills', label: 'Skills (comma-separated)' }, // ➕ Added
               ].map((field) => (
                 <div key={field.name} className='space-y-2'>
                   {loading ? (

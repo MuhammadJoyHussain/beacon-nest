@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router'
-import Header from '@/components/dashboard/Header'
 import api from '@/utils/api'
 import React, { useState, useEffect } from 'react'
 import Button from '@/components/ui/Button'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import authApi from '@/utils/authApi'
 
 const VacancyDetail = () => {
   const router = useRouter()
@@ -14,6 +14,12 @@ const VacancyDetail = () => {
   const [vacancy, setVacancy] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const [userSkills, setUserSkills] = useState([])
+  const [skillGap, setSkillGap] = useState([])
+  const [courses, setCourse] = useState([])
+  const [skillLoading, setSkillLoading] = useState(false)
+
+  // Fetch vacancy
   useEffect(() => {
     if (!router.isReady || !id) return
 
@@ -30,6 +36,58 @@ const VacancyDetail = () => {
 
     fetchVacancy()
   }, [router.isReady, id])
+
+  // Fetch user profile (for skills)
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const fetchUserSkills = async () => {
+      try {
+        const { data } = await authApi.get('/auth/profile', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        setUserSkills(data.skills || [])
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+      }
+    }
+
+    fetchUserSkills()
+  }, [])
+
+  // Calculate skill gap
+  useEffect(() => {
+    if (!vacancy || !userSkills.length) return
+
+    const required = vacancy.skills || []
+    const userSkillsLower = userSkills.map((s) => s.toLowerCase())
+
+    const gap = required.filter(
+      (skill) => !userSkillsLower.includes(skill.toLowerCase())
+    )
+
+    setSkillGap(gap)
+  }, [vacancy, userSkills])
+
+  useEffect(() => {
+    if (skillGap.length === 0) return
+
+    const fetchCourses = async () => {
+      setSkillLoading(true)
+      try {
+        const query = skillGap.map((s) => s.toLowerCase()).join(',')
+        const { data } = await api.get(`/course?skills=${query}`)
+
+        setCourse(data)
+      } catch (err) {
+        console.error('Error fetching course:', err)
+      } finally {
+        setSkillLoading(false)
+      }
+    }
+
+    fetchCourses()
+  }, [skillGap])
 
   return (
     <div className='flex h-screen background'>
@@ -148,6 +206,71 @@ const VacancyDetail = () => {
                 </>
               )}
 
+              {/* Skill Gap & Recommended Courses */}
+              {!loading && skillGap.length > 0 && (
+                <div>
+                  <h2 className='text-xl font-semibold text-foundation-primary mb-2'>
+                    Skill Gap
+                  </h2>
+                  <ul className='list-disc list-inside text-foundation-softblue space-y-1'>
+                    {skillGap.map((skill, i) => (
+                      <li key={i}>{skill}</li>
+                    ))}
+                  </ul>
+
+                  <div className='mt-6'>
+                    {skillLoading ? (
+                      <Skeleton count={3} />
+                    ) : (
+                      <ul className='list-disc list-inside text-foundation-softblue space-y-1'>
+                        {courses.length > 0 && (
+                          <section className='bg-gray-100 rounded-2xl p-6 shadow-sm'>
+                            <h3 className='font-semibold text-foundation-primary mb-6 border-b border-foundation-blue pb-3'>
+                              Recommended Courses
+                            </h3>
+                            {courses.map(({ _id, skill, courses }) => (
+                              <div key={_id} className='mb-6'>
+                                <h4 className='text-lg font-semibold text-foundation-primary mb-3 capitalize border-b pb-2'>
+                                  {skill}
+                                </h4>
+                                <ul className='space-y-4 ml-4'>
+                                  {courses.map(
+                                    ({
+                                      _id: courseId,
+                                      title,
+                                      url,
+                                      provider,
+                                    }) => (
+                                      <li
+                                        key={courseId}
+                                        className='p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                                      >
+                                        <a
+                                          href={url}
+                                          target='_blank'
+                                          rel='noopener noreferrer'
+                                          className='text-foundation-primary font-semibold underline hover:text-foundation-blue'
+                                        >
+                                          {title}
+                                        </a>
+                                        <h5 className='text-gray-600 text-sm mt-1'>
+                                          Provider: {provider}
+                                        </h5>
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </div>
+                            ))}
+                          </section>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Apply Button */}
               <div className='text-center'>
                 {loading ? (
                   <Skeleton width={120} height={40} />
