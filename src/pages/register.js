@@ -148,15 +148,12 @@ const Register = () => {
       }
 
       reset({ ...formData, ...data })
-
-      console.log(data)
     } catch (error) {
       console.error('Upload error:', error)
       toast.error(error.response?.data?.message || 'Error uploading PDF')
     }
   }
 
-  // Additional handlers for experience section
   const addExperience = () => {
     setValue('employeeExperience', [
       ...formData.employeeExperience,
@@ -189,7 +186,7 @@ const Register = () => {
   }
 
   const removeSkill = (index) => {
-    if (formData.skills.length <= 1) return // Don't remove if only one skill left
+    if (formData.skills.length <= 1) return
     const updated = [...formData.skills]
     updated.splice(index, 1)
     setValue('skills', updated)
