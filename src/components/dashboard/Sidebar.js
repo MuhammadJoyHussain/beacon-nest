@@ -40,6 +40,16 @@ const Sidebar = () => {
     { href: '/admin/jobs/post', label: 'Post Job', icon: 'jobs.svg' },
   ]
 
+  const employerMenuItems = [
+    { href: '/employer/dashboard', label: 'Dashboard', icon: 'dashboard.svg' },
+    { href: '/employer/jobs', label: 'My Job Posts', icon: 'jobs.svg' },
+    {
+      href: '/employer/jobs/post',
+      label: 'Post New Job',
+      icon: 'cv-manage.svg',
+    },
+  ]
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     router.push('/login')
@@ -47,7 +57,15 @@ const Sidebar = () => {
 
   const toggleSidebar = () => setIsOpen(!isOpen)
 
-  const menuItems = role === 'admin' ? adminMenuItems : userMenuItems
+  let menuItems = []
+
+  if (role === 'admin') {
+    menuItems = adminMenuItems
+  } else if (role === 'employer') {
+    menuItems = employerMenuItems
+  } else {
+    menuItems = userMenuItems
+  }
 
   if (role === null) return null
 

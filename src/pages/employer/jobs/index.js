@@ -7,8 +7,8 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { parseJwt } from '@/utils/parseJWT'
 import api from '@/utils/api'
 
-const RecommendationsPage = () => {
-  const [recommendedJobs, setRecommendedJobs] = useState([])
+const EmployerJobsPage = () => {
+  const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -19,27 +19,34 @@ const RecommendationsPage = () => {
       setError('No token found, please login')
       return
     }
+
     const decoded = parseJwt(token)
     if (decoded && decoded.id) {
-      getRecommendations(decoded.id, token)
+      fetchEmployerJobs(decoded.id, token)
     } else {
-      setError('Invalid token: user ID not found')
+      setError('Invalid token: employer ID not found')
     }
   }, [])
 
-  async function getRecommendations(userId, token) {
+  async function fetchEmployerJobs(employerId, token) {
     setLoading(true)
     setError(null)
 
+    console.log(employerId)
+
     try {
-      const res = await api.get(`/recommend/${userId}`, {
+      const res = await api.get(`/vacancy/employer/${employerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      setRecommendedJobs(res.data)
+
+      console.log(res.data.results)
+
+      setJobs(res.data.results)
     } catch (err) {
-      setError('Failed to fetch recommendations')
+      setError('Failed to fetch employer jobs')
       console.error(err)
     }
+
     setLoading(false)
   }
 
@@ -50,7 +57,7 @@ const RecommendationsPage = () => {
         <main className='flex-grow overflow-auto p-6'>
           <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
             <h2 className='text-2xl font-bold text-foundation-primary'>
-              Recommended Jobs for You
+              Jobs Posted by You
             </h2>
 
             {error && (
@@ -74,12 +81,12 @@ const RecommendationsPage = () => {
                       <Skeleton height={16} width={'30%'} className='mt-1' />
                     </li>
                   ))
-                : recommendedJobs.map((job) => (
+                : jobs.map((job) => (
                     <li
-                      key={job.job_id}
+                      key={job._id}
                       className='border border-foundation-pale rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer'
                     >
-                      <Link href={`/applicant/recommendation/${job.job_id}`}>
+                      <Link href={`/employer/jobs/recommend_user/${job._id}`}>
                         <div className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0'>
                           <h3 className='text-foundation-primary'>
                             {job.title}
@@ -103,4 +110,4 @@ const RecommendationsPage = () => {
   )
 }
 
-export default RecommendationsPage
+export default EmployerJobsPage

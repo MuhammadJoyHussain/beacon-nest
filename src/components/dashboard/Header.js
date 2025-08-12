@@ -82,6 +82,8 @@ const Header = () => {
                     </p>
                     {user.role === 'admin' ? (
                       <p className='text-xs text-[#7091E6]'>Recruiter</p>
+                    ) : user.role === 'employer' ? (
+                      <p className='text-xs text-[#7091E6]'>Employer</p>
                     ) : (
                       <p className='text-xs text-[#7091E6]'>Applicant</p>
                     )}

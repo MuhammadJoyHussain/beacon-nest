@@ -19,7 +19,6 @@ const VacancyDetail = () => {
   const [courses, setCourse] = useState([])
   const [skillLoading, setSkillLoading] = useState(false)
 
-  // Fetch vacancy
   useEffect(() => {
     if (!router.isReady || !id) return
 
@@ -37,7 +36,6 @@ const VacancyDetail = () => {
     fetchVacancy()
   }, [router.isReady, id])
 
-  // Fetch user profile (for skills)
   useEffect(() => {
     const token = localStorage.getItem('token')
     const fetchUserSkills = async () => {
@@ -55,7 +53,6 @@ const VacancyDetail = () => {
     fetchUserSkills()
   }, [])
 
-  // Calculate skill gap
   useEffect(() => {
     if (!vacancy || !userSkills.length) return
 
