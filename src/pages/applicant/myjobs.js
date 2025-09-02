@@ -46,30 +46,39 @@ const Joblist = () => {
     fetchApplications()
   }, [])
 
+  // Badge colors for statuses
+  const statusColors = {
+    Pending: 'bg-yellow-100 text-yellow-700',
+    Accepted: 'bg-green-100 text-green-700',
+    Rejected: 'bg-red-100 text-red-700',
+  }
+
   return (
-    <div className='flex h-screen bg-foundation-background'>
+    <div className='flex h-screen bg-gradient-to-br from-indigo-50 to-white'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <main className='flex-grow overflow-auto p-6'>
-          <div className='max-w-5xl mx-auto bg-white shadow-xl rounded-3xl p-10 space-y-8'>
-            <h2 className='text-2xl font-bold'>My Applications</h2>
+          <div className='max-w-6xl mx-auto bg-white shadow-2xl rounded-3xl p-10 space-y-10'>
+            <h2 className='text-3xl font-bold text-gray-900'>
+              My Applications
+            </h2>
 
             {error && (
               <div className='text-center text-red-500 text-lg'>{error}</div>
             )}
 
             {loading ? (
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div
                     key={index}
-                    className='bg-foundation-pale rounded-xl p-6 shadow-sm'
+                    className='bg-gray-100 rounded-xl p-6 shadow-sm'
                   >
-                    <Skeleton height={20} width={'60%'} />
-                    <Skeleton height={20} width={'40%'} className='mt-2' />
-                    <Skeleton height={16} width={'50%'} className='mt-4' />
+                    <Skeleton height={24} width={'70%'} />
+                    <Skeleton height={20} width={'50%'} className='mt-2' />
+                    <Skeleton height={16} width={'40%'} className='mt-4' />
                     <Skeleton
-                      height={28}
+                      height={30}
                       width={100}
                       className='mt-6 rounded-full'
                     />
@@ -77,26 +86,32 @@ const Joblist = () => {
                 ))}
               </div>
             ) : appliedJobs.length === 0 ? (
-              <div className='text-center text-foundation-softblue text-lg py-10'>
+              <div className='text-center text-gray-500 text-lg py-10'>
                 You haven’t applied for any jobs yet.
               </div>
             ) : (
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                {appliedJobs.map((job, index) => (
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {appliedJobs.map((job) => (
                   <div
-                    key={index}
-                    className='bg-foundation-pale rounded-xl p-6 shadow-sm hover:shadow-md transition'
+                    key={job._id}
+                    className='bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl p-6 text-white shadow-md transform hover:scale-[1.02] transition'
                   >
-                    <h3 className='text-white'>{job.title}</h3>
-                    <p className='text-white'>{job.company}</p>
-                    <p className='text-sm text-white'>
+                    <h3 className='text-xl font-semibold'>{job.title}</h3>
+                    <p className='text-indigo-100'>{job.company}</p>
+                    <p className='text-sm text-indigo-200'>
                       Applied: {job.dateApplied}
                     </p>
-                    <span className='inline-block mt-3 px-3 py-1 text-sm rounded-full bg-foundation-blue text-white font-medium'>
+
+                    <span
+                      className={`inline-block mt-4 px-3 py-1 text-sm font-medium rounded-full ${
+                        statusColors[job.status] || 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
                       {job.status}
                     </span>
+
                     <Link href={`/applicant/job/${job._id}`}>
-                      <button className='mt-4 inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition'>
+                      <button className='mt-6 w-full bg-white text-indigo-700 px-4 py-2 rounded-full font-semibold shadow hover:bg-indigo-50 transition'>
                         View Details
                       </button>
                     </Link>

@@ -72,7 +72,7 @@ const RecommendationsPage = () => {
   }
 
   return (
-    <div className='flex min-h-screen bg-gray-50'>
+    <div className='flex h-screen bg-gray-50'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <main className='flex-grow overflow-auto p-6'>
