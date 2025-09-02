@@ -34,7 +34,6 @@ const RecommendationsPage = () => {
     } else {
       setError('Invalid token: user ID not found')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function getRecommendations(userId, token) {
@@ -121,90 +120,68 @@ const RecommendationsPage = () => {
                     return (
                       <li
                         key={jobId}
-                        className='group border border-gray-100 rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 p-6'
+                        className='group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 duration-200 p-6'
                       >
                         <Link href={`/applicant/recommendation/${jobId}`}>
-                          <div className='flex flex-col gap-3'>
-                            <div className='flex items-start justify-between gap-4'>
+                          <div className='flex flex-col gap-4'>
+                            {/* Header */}
+                            <div className='flex items-start justify-between'>
                               <div className='min-w-0'>
-                                <h3 className='text-lg md:text-xl font-semibold text-gray-900 truncate'>
-                                  {job.title || 'Untitled role'}
+                                <h3 className='text-lg font-bold text-gray-900 truncate'>
+                                  {job.title || 'Untitled Role'}
                                 </h3>
-                                <div className='mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-600'>
-                                  {job.company && (
-                                    <span className='font-medium text-foundation-blue'>
-                                      {job.company}
-                                    </span>
-                                  )}
-                                  {job.location && (
-                                    <>
-                                      <span aria-hidden>•</span>
-                                      <span>{job.location}</span>
-                                    </>
-                                  )}
-                                  {job.type && (
-                                    <>
-                                      <span aria-hidden>•</span>
-                                      <span>{job.type}</span>
-                                    </>
-                                  )}
-                                </div>
+                                <p className='mt-1 text-sm text-gray-600'>
+                                  <span className='font-medium text-indigo-600'>
+                                    {job.company}
+                                  </span>
+                                  {job.location && <> • {job.location}</>}
+                                  {job.type && <> • {job.type}</>}
+                                </p>
                               </div>
 
-                              <div className='shrink-0'>
-                                <span
-                                  className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
-                                  bg-gradient-to-r from-foundation-blue to-foundation-primary text-white shadow-sm'
-                                  title='Match probability'
-                                >
-                                  {percent}
-                                </span>
+                              {/* Circular match badge */}
+                              <div className='flex-shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center text-white font-bold shadow-md'>
+                                {percent}
                               </div>
                             </div>
 
+                            {/* Summary */}
                             {job.summary && (
                               <p className='text-sm text-gray-700 line-clamp-3'>
                                 {job.summary}
                               </p>
                             )}
 
-                            <div className='mt-2'>
-                              <div className='flex items-center justify-between text-xs text-gray-500 mb-1'>
-                                <span>Match</span>
+                            {/* Progress bar */}
+                            <div>
+                              <div className='flex justify-between text-xs text-gray-500 mb-1'>
+                                <span>Match Probability</span>
                                 <span>{percent}</span>
                               </div>
-                              <div
-                                className='h-2 w-full rounded-full bg-gray-100 overflow-hidden'
-                                role='progressbar'
-                                aria-valuemin={0}
-                                aria-valuemax={100}
-                                aria-valuenow={Math.round(prob * 100)}
-                                aria-label='Match probability'
-                              >
+                              <div className='w-full h-2 bg-gray-100 rounded-full overflow-hidden'>
                                 <div
-                                  className='h-full w-0 rounded-full bg-gradient-to-r from-foundation-blue to-foundation-primary transition-all duration-500'
+                                  className='h-full bg-gradient-to-r from-indigo-600 to-blue-500 transition-all duration-500'
                                   style={{
-                                    width: `${
-                                      Math.max(0, Math.min(1, prob)) * 100
-                                    }%`,
+                                    width: `${Math.round(prob * 100)}%`,
                                   }}
                                 />
                               </div>
                             </div>
 
+                            {/* Skills */}
                             {matched.length > 0 && (
                               <div className='mt-3 flex flex-wrap gap-2'>
-                                {matched.slice(0, 10).map((skill) => (
+                                {matched.slice(0, 8).map((skill) => (
                                   <span
                                     key={skill}
-                                    className='px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200'
+                                    className='px-2 py-1 text-xs rounded-full bg-green-50 text-green-700 border border-green-200'
                                   >
                                     {skill}
                                   </span>
                                 ))}
-                                {matched.length > 10 && (
-                                  <span className='px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200'>
-                                    +{matched.length - 10} more
+                                {matched.length > 8 && (
+                                  <span className='px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600'>
+                                    +{matched.length - 8} more
                                   </span>
                                 )}
                               </div>

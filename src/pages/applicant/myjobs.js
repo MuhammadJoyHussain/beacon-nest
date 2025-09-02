@@ -54,11 +54,11 @@ const Joblist = () => {
   }
 
   return (
-    <div className='flex h-screen bg-gradient-to-br from-indigo-50 to-white'>
+    <div className='flex h-screen bg-gray-50'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
         <main className='flex-grow overflow-auto p-6'>
-          <div className='max-w-6xl mx-auto bg-white shadow-2xl rounded-3xl p-10 space-y-10'>
+          <div className='max-w-6xl mx-auto bg-white shadow rounded-3xl p-10 space-y-10'>
             <h2 className='text-3xl font-bold text-gray-900'>
               My Applications
             </h2>
@@ -72,7 +72,7 @@ const Joblist = () => {
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div
                     key={index}
-                    className='bg-gray-100 rounded-xl p-6 shadow-sm'
+                    className='bg-white border rounded-xl p-6 shadow-sm'
                   >
                     <Skeleton height={24} width={'70%'} />
                     <Skeleton height={20} width={'50%'} className='mt-2' />
@@ -94,16 +94,18 @@ const Joblist = () => {
                 {appliedJobs.map((job) => (
                   <div
                     key={job._id}
-                    className='bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl p-6 text-white shadow-md transform hover:scale-[1.02] transition'
+                    className='bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition'
                   >
-                    <h3 className='text-xl font-semibold'>{job.title}</h3>
-                    <p className='text-indigo-100'>{job.company}</p>
-                    <p className='text-sm text-indigo-200'>
+                    <h3 className='text-lg font-semibold text-gray-900'>
+                      {job.title}
+                    </h3>
+                    <p className='text-gray-600'>{job.company}</p>
+                    <p className='text-sm text-gray-500'>
                       Applied: {job.dateApplied}
                     </p>
 
                     <span
-                      className={`inline-block mt-4 px-3 py-1 text-sm font-medium rounded-full ${
+                      className={`inline-block mt-3 px-3 py-1 text-sm font-medium rounded-full ${
                         statusColors[job.status] || 'bg-gray-200 text-gray-700'
                       }`}
                     >
@@ -111,7 +113,7 @@ const Joblist = () => {
                     </span>
 
                     <Link href={`/applicant/job/${job._id}`}>
-                      <button className='mt-6 w-full bg-white text-indigo-700 px-4 py-2 rounded-full font-semibold shadow hover:bg-indigo-50 transition'>
+                      <button className='mt-5 w-full border border-indigo-600 text-indigo-600 px-4 py-2 rounded-full font-medium hover:bg-indigo-50 transition'>
                         View Details
                       </button>
                     </Link>

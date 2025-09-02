@@ -17,7 +17,7 @@ const VacancyDetail = () => {
 
   const [userSkills, setUserSkills] = useState([])
   const [skillGap, setSkillGap] = useState([])
-  const [courses, setCourse] = useState([])
+  const [courses, setCourses] = useState([])
   const [skillLoading, setSkillLoading] = useState(false)
 
   useEffect(() => {
@@ -44,7 +44,6 @@ const VacancyDetail = () => {
         const { data } = await authApi.get('/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
-
         setUserSkills(data.skills || [])
       } catch (error) {
         console.error('Error fetching user profile:', error)
@@ -56,34 +55,26 @@ const VacancyDetail = () => {
 
   useEffect(() => {
     if (!vacancy || !userSkills.length) return
-
     const required = (vacancy.skills || []).map((s) => s.toLowerCase())
     const userSkillsLower = userSkills.map((s) => s.toLowerCase())
-
     const gap = required.filter((skill) => !userSkillsLower.includes(skill))
-
     setSkillGap(gap)
   }, [vacancy, userSkills])
 
   useEffect(() => {
     if (skillGap.length === 0) return
-
     const fetchCourses = async () => {
       setSkillLoading(true)
       try {
         const query = skillGap.map((s) => s.toLowerCase()).join(',')
         const { data } = await api.get(`/course?skills=${query}`)
-
-        setCourse(data)
-
-        console.log(courses)
+        setCourses(data)
       } catch (err) {
         console.error('Error fetching course:', err)
       } finally {
         setSkillLoading(false)
       }
     }
-
     fetchCourses()
   }, [skillGap])
 
@@ -91,164 +82,163 @@ const VacancyDetail = () => {
     <div className='flex h-screen bg-gray-50'>
       <Sidebar />
       <div className='flex flex-col flex-grow'>
-        <main className='flex-grow overflow-auto p-6 pt-24'>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className='max-w-5xl mx-auto bg-white shadow-2xl rounded-3xl p-10 space-y-10'
-          >
-            {/* Job Title */}
-            <h1 className='text-3xl font-bold text-gray-900'>
-              {loading ? <Skeleton width={300} height={28} /> : vacancy?.title}
-            </h1>
+        <main className='flex-grow overflow-auto p-8'>
+          <div className='max-w-6xl mx-auto space-y-12'>
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className='bg-white shadow rounded-2xl p-8 space-y-4'
+            >
+              <h1 className='text-3xl font-bold text-gray-900'>
+                {loading ? <Skeleton width={300} /> : vacancy?.title}
+              </h1>
+              <p className='text-lg text-indigo-700 font-medium'>
+                {loading ? <Skeleton width={200} /> : vacancy?.company}
+              </p>
 
-            {/* Job Meta */}
-            <div className='grid md:grid-cols-2 gap-4 text-gray-600'>
-              {loading ? (
-                <Skeleton count={4} height={20} />
-              ) : (
-                <>
-                  <p>
-                    <span className='font-semibold'>Company:</span>{' '}
-                    {vacancy.company}
-                  </p>
-                  <p>
-                    <span className='font-semibold'>Location:</span>{' '}
-                    {vacancy.location}
-                  </p>
-                  <p>
-                    <span className='font-semibold'>Type:</span> {vacancy.type}
-                  </p>
-                  <p>
-                    <span className='font-semibold'>Salary:</span>{' '}
-                    {vacancy.salary}
-                  </p>
-                </>
-              )}
-            </div>
-
-            {/* Sections */}
-            <div className='space-y-8'>
-              {[
-                {
-                  title: 'Company Overview',
-                  content: vacancy?.companyOverview,
-                },
-                { title: 'Job Summary', content: vacancy?.jobSummary },
-              ].map((section, i) =>
-                section.content && !loading ? (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className='bg-gray-50 rounded-2xl p-6 shadow-sm'
-                  >
-                    <h2 className='text-xl font-semibold text-gray-800 border-b pb-2 mb-3'>
-                      {section.title}
-                    </h2>
-                    <p className='text-gray-600'>{section.content}</p>
-                  </motion.div>
-                ) : null
-              )}
-
-              {/* Lists */}
-              {[
-                'keyResponsibilities',
-                'requiredQualifications',
-                'preferredQualifications',
-                'benefits',
-              ].map((key, i) =>
-                vacancy?.[key]?.length > 0 && !loading ? (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.15 }}
-                    className='bg-gray-50 rounded-2xl p-6 shadow-sm'
-                  >
-                    <h2 className='text-xl font-semibold text-gray-800 border-b pb-2 mb-3'>
-                      {key.replace(/([A-Z])/g, ' $1')}
-                    </h2>
-                    <ul className='list-disc list-inside space-y-2 text-gray-600'>
-                      {vacancy[key].map((item, idx) => (
-                        <li key={idx}>{item}</li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ) : null
-              )}
-            </div>
-
-            {/* Skill Gap */}
-            {!loading && skillGap.length > 0 && (
-              <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-inner'>
-                <h2 className='text-xl font-semibold text-indigo-700 mb-4'>
-                  Skill Gap
-                </h2>
-                <div className='flex flex-wrap gap-2'>
-                  {skillGap.map((skill, i) => (
-                    <span
-                      key={i}
-                      className='px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium'
-                    >
-                      {skill}
+              {/* Meta */}
+              <div className='flex flex-wrap gap-3 text-sm text-gray-600'>
+                {loading ? (
+                  <Skeleton count={3} width={100} />
+                ) : (
+                  <>
+                    <span className='px-3 py-1 bg-gray-100 rounded-full'>
+                      📍 {vacancy?.location}
                     </span>
-                  ))}
+                    <span className='px-3 py-1 bg-gray-100 rounded-full'>
+                      💼 {vacancy?.type}
+                    </span>
+                    <span className='px-3 py-1 bg-gray-100 rounded-full'>
+                      💰 {vacancy?.salary}
+                    </span>
+                  </>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Job Description Sections */}
+            <div className='grid md:grid-cols-3 gap-8'>
+              <div className='md:col-span-2 space-y-8'>
+                {[
+                  {
+                    title: 'Company Overview',
+                    content: vacancy?.companyOverview,
+                  },
+                  { title: 'Job Summary', content: vacancy?.jobSummary },
+                ].map(
+                  (section, i) =>
+                    section.content && (
+                      <Section key={i} title={section.title}>
+                        <p className='text-gray-700 leading-relaxed'>
+                          {section.content}
+                        </p>
+                      </Section>
+                    )
+                )}
+
+                {[
+                  'keyResponsibilities',
+                  'requiredQualifications',
+                  'preferredQualifications',
+                  'benefits',
+                ].map(
+                  (key, i) =>
+                    vacancy?.[key]?.length > 0 && (
+                      <Section key={i} title={key.replace(/([A-Z])/g, ' $1')}>
+                        <ul className='list-disc list-inside space-y-2 text-gray-700'>
+                          {vacancy[key].map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </Section>
+                    )
+                )}
+              </div>
+
+              {/* Sidebar Summary */}
+              <aside className='space-y-6'>
+                <div className='bg-white rounded-2xl shadow p-6 space-y-3'>
+                  <h3 className='text-lg font-semibold text-indigo-700'>
+                    Quick Info
+                  </h3>
+                  <p>
+                    <strong>Type:</strong> {vacancy?.type}
+                  </p>
+                  <p>
+                    <strong>Salary:</strong> {vacancy?.salary}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {vacancy?.location}
+                  </p>
                 </div>
 
-                {/* Recommended Courses */}
-                <div className='mt-6'>
-                  {skillLoading ? (
-                    <Skeleton count={3} />
-                  ) : (
-                    courses.length > 0 && (
-                      <section>
-                        <h3 className='text-lg font-semibold text-indigo-700 mb-4'>
-                          Recommended Courses
-                        </h3>
-                        <div className='grid md:grid-cols-2 gap-4'>
-                          {courses.map(({ _id, skill, courses }) => (
-                            <div key={_id} className='space-y-4'>
-                              <h4 className='text-gray-800 font-semibold border-b pb-2 capitalize'>
-                                {skill}
-                              </h4>
-                              {courses.map(
-                                ({ _id: courseId, title, url, provider }) => (
-                                  <a
-                                    key={courseId}
-                                    href={url}
-                                    target='_blank'
-                                    rel='noopener noreferrer'
-                                    className='block p-4 bg-white rounded-xl shadow hover:shadow-lg transition'
-                                  >
-                                    <p className='font-semibold text-indigo-600'>
-                                      {title}
-                                    </p>
-                                    <span className='text-sm text-gray-500'>
-                                      Provider: {provider}
-                                    </span>
-                                  </a>
-                                )
-                              )}
-                            </div>
-                          ))}
+                {!loading && skillGap.length > 0 && (
+                  <div className='bg-white rounded-2xl shadow p-6 space-y-4'>
+                    <h3 className='text-lg font-semibold text-indigo-700'>
+                      Skill Gap
+                    </h3>
+                    <div className='flex flex-wrap gap-2'>
+                      {skillGap.map((skill, i) => (
+                        <span
+                          key={i}
+                          className='px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm'
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Recommended Courses */}
+                    {skillLoading ? (
+                      <Skeleton count={2} />
+                    ) : (
+                      courses.length > 0 && (
+                        <div>
+                          <h4 className='text-sm font-semibold text-gray-700 mb-2'>
+                            Recommended Courses
+                          </h4>
+                          <div className='space-y-3'>
+                            {courses.map(({ _id, skill, courses }) => (
+                              <div key={_id}>
+                                <p className='font-semibold text-gray-800 mb-1 capitalize'>
+                                  {skill}
+                                </p>
+                                {courses.map(
+                                  ({ _id: cid, title, url, provider }) => (
+                                    <a
+                                      key={cid}
+                                      href={url}
+                                      target='_blank'
+                                      rel='noopener noreferrer'
+                                      className='block text-sm text-indigo-600 hover:underline'
+                                    >
+                                      {title}{' '}
+                                      <span className='text-gray-500'>
+                                        ({provider})
+                                      </span>
+                                    </a>
+                                  )
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </section>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
+                      )
+                    )}
+                  </div>
+                )}
+              </aside>
+            </div>
 
             {/* Apply Button */}
             <div className='text-center'>
               {loading ? (
-                <Skeleton width={120} height={40} />
+                <Skeleton width={140} height={40} />
               ) : (
                 <Button
-                  className='font-semibold bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-6 py-3 rounded-full shadow hover:opacity-90 transition'
+                  className='font-semibold bg-indigo-600 text-white px-6 py-3 rounded-full shadow hover:bg-indigo-700 transition'
                   onClick={() => {
                     const token = localStorage.getItem('token')
                     if (!token) {
@@ -264,9 +254,20 @@ const VacancyDetail = () => {
                 </Button>
               )}
             </div>
-          </motion.div>
+          </div>
         </main>
       </div>
+    </div>
+  )
+}
+
+function Section({ title, children }) {
+  return (
+    <div className='bg-white rounded-2xl shadow p-6'>
+      <h2 className='text-xl font-semibold text-gray-800 border-b pb-2 mb-3'>
+        {title}
+      </h2>
+      {children}
     </div>
   )
 }
