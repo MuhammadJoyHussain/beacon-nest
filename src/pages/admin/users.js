@@ -292,7 +292,6 @@ export default function AdminUserManagement() {
                           >
                             <option value='user'>User</option>
                             <option value='admin'>Admin</option>
-                            <option value='employer'>Employer</option>
                           </select>
                         </td>
                         <td className='px-6 py-4 text-center space-x-2'>
