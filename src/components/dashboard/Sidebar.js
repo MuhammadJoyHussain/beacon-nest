@@ -105,9 +105,6 @@ const Sidebar = () => {
       ? employerMenuItems
       : userMenuItems
 
-  // Precise active detection:
-  // - For parent listing pages like /employer/jobs and /admin/jobs, highlight ONLY on exact match
-  // - For other items, highlight on exact or sub-route match
   const isExactOnly = (href) =>
     href === '/employer/jobs' || href === '/admin/jobs'
   const isActive = (href) => {
@@ -115,11 +112,17 @@ const Sidebar = () => {
     return router.pathname === href || router.pathname.startsWith(`${href}/`)
   }
 
+  const profileHref =
+    role === 'admin'
+      ? '/admin/profile'
+      : role === 'employer'
+      ? '/employer/profile'
+      : '/applicant/profile'
+
   if (role === null) return null
 
   return (
     <div>
-      {/* Mobile Toggle */}
       <button
         onClick={toggleSidebar}
         className='mt-16 lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-foundation-primary text-white shadow-md focus:outline-none focus:ring-2 focus:ring-white/50'
@@ -128,7 +131,6 @@ const Sidebar = () => {
         {isOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      {/* Backdrop (mobile) */}
       {isOpen && (
         <button
           aria-label='Close menu'
@@ -137,7 +139,6 @@ const Sidebar = () => {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full w-72
           bg-gradient-to-b from-foundation-primary via-foundation-blue to-foundation-blue
@@ -146,45 +147,44 @@ const Sidebar = () => {
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static`}
       >
-        {/* Header / Brand */}
         <div className='px-6 pt-6 pb-4 border-b border-white/10'>
           <div className='flex items-center gap-3'>
-            <div className='h-10 w-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center shadow'>
-              <Briefcase size={18} />
-            </div>
             <div>
-              <div className='text-lg font-semibold leading-tight'>
+              <Link
+                href='/'
+                className='text-lg font-semibold leading-tight text-white'
+              >
                 Beacon Nest
-              </div>
-              <div className='text-xs text-white/70 -mt-0.5 tracking-wide'>
-                Recruitment Suite
-              </div>
+              </Link>
             </div>
           </div>
 
-          {/* User Card */}
-          <div className='mt-4 flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5'>
-            <div className='h-9 w-9 rounded-full bg-white/20 flex items-center justify-center'>
+          <Link
+            href={profileHref}
+            onClick={() => setIsOpen(false)}
+            aria-label='Open profile'
+            className='mt-4 flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white/40 transition text-white'
+          >
+            <div className='h-9 w-9 rounded-full bg-white/20 flex items-center justify-center text-white'>
               <Users size={16} />
             </div>
             <div className='flex-1'>
-              <div className='text-sm font-medium'>Signed in</div>
-              <div className='text-xs text-white/70 capitalize'>{role}</div>
+              <div className='text-sm font-medium text-white'>Signed in</div>
+              <div className='text-xs text-white capitalize'>{role}</div>
             </div>
-            <span className='inline-flex items-center rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide'>
+            <span className='inline-flex items-center rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white'>
               {role === 'admin'
                 ? 'ADMIN'
                 : role === 'employer'
                 ? 'EMPLOYER'
                 : 'APPLICANT'}
             </span>
-          </div>
+          </Link>
         </div>
 
-        {/* Nav */}
         <HMenu
           as='nav'
-          className='h-[calc(100%-172px)] overflow-y-auto px-3 py-4'
+          className='h-[calc(100%-172px)] overflow-y-auto px-3 py-4 text-white'
         >
           <ul className='space-y-1'>
             {menuItems.map(({ href, label, icon }) => {
@@ -195,67 +195,55 @@ const Sidebar = () => {
                     href={href}
                     aria-current={active ? 'page' : undefined}
                     onClick={() => setIsOpen(false)}
-                    className={`
-                      group relative flex items-center gap-3 rounded-xl px-4 py-3
-                      focus:outline-none focus:ring-2 focus:ring-white/40
-                      transition
-                      ${
-                        active
-                          ? 'bg-white/15 shadow-inner'
-                          : 'hover:bg-white/10'
-                      }
-                    `}
+                    className={`group relative flex items-center gap-3 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/40 transition ${
+                      active ? 'bg-white/15 shadow-inner' : 'hover:bg-white/10'
+                    } text-white`}
                   >
-                    {/* Active indicator bar */}
                     <span
-                      className={`absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r
-                        ${
-                          active
-                            ? 'bg-white'
-                            : 'bg-transparent group-hover:bg-white/60'
-                        }`}
+                      className={`absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r ${
+                        active
+                          ? 'bg-white'
+                          : 'bg-transparent group-hover:bg-white/60'
+                      }`}
                       aria-hidden
                     />
                     <span
-                      className={`grid place-items-center h-9 w-9 rounded-lg
-                        ${
-                          active
-                            ? 'bg-white/20'
-                            : 'bg-white/10 group-hover:bg-white/15'
-                        }
-                      `}
+                      className={`grid place-items-center h-9 w-9 rounded-lg ${
+                        active
+                          ? 'bg-white/20'
+                          : 'bg-white/10 group-hover:bg-white/15'
+                      } text-white`}
                     >
                       {icon}
                     </span>
-                    <span className='text-sm font-medium'>{label}</span>
+                    <span className='text-sm font-medium text-white'>
+                      {label}
+                    </span>
                   </Link>
                 </HMenu.Item>
               )
             })}
 
-            {/* Divider */}
             <li className='my-2 border-t border-white/10' />
 
-            {/* Logout */}
             <HMenu.Item as={Fragment}>
               <button
                 onClick={handleLogout}
-                className='group relative w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/40 transition'
+                className='group relative w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/40 transition text-white'
               >
-                <span className='grid place-items-center h-9 w-9 rounded-lg bg-white/10 group-hover:bg-white/15'>
+                <span className='grid place-items-center h-9 w-9 rounded-lg bg-white/10 group-hover:bg-white/15 text-white'>
                   <LogOut size={18} />
                 </span>
-                <span className='text-sm font-medium'>Logout</span>
+                <span className='text-sm font-medium text-white'>Logout</span>
               </button>
             </HMenu.Item>
           </ul>
         </HMenu>
 
-        {/* Footer */}
-        <div className='absolute bottom-0 inset-x-0 px-6 py-3 border-t border-white/10 text-[11px] text-white/70'>
+        <div className='absolute bottom-0 inset-x-0 px-6 py-3 border-t border-white/10 text-[11px] text-white'>
           <div className='flex items-center justify-between'>
-            <span>v1.0</span>
-            <span className='hidden sm:inline'>
+            <span className='text-white'>v1.0</span>
+            <span className='hidden sm:inline text-white'>
               © {new Date().getFullYear()} Beacon Nest
             </span>
           </div>

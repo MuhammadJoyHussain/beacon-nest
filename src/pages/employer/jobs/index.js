@@ -12,7 +12,6 @@ const EmployerJobsPage = () => {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Guard for SSR
     if (typeof window === 'undefined') return
 
     const token = localStorage.getItem('token')

@@ -14,7 +14,6 @@ import Sidebar from '@/components/dashboard/Sidebar'
 import Button from '@/components/ui/Button'
 import Select from '@/components/ui/Select'
 import SelectItem from '@/components/ui/SelectItem'
-import Input from '@/components/ui/Input'
 import toast from 'react-hot-toast'
 import api from '@/utils/api'
 import { parseJwt } from '@/utils/parseJWT'
@@ -219,478 +218,524 @@ export default function JobApplicationsPage() {
     return s
   }, [applications])
 
+  const StatusTab = ({ value, label, count }) => {
+    const active = statusFilter.toLowerCase() === value.toLowerCase()
+    return (
+      <button
+        onClick={() => setStatusFilter(label)}
+        className={`shrink-0 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+          active
+            ? 'bg-foundation-primary text-white'
+            : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+        }`}
+      >
+        <span className='whitespace-nowrap'>{label}</span>
+        <span
+          className={`inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[11px] ${
+            active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+          }`}
+        >
+          {count}
+        </span>
+      </button>
+    )
+  }
+
   if (error)
     return (
-      <div className='flex items-center justify-center min-h-screen text-red-600'>
+      <div className='flex items-center justify-center h-screen px-4 text-center text-red-600'>
         {error}
       </div>
     )
 
   return (
-    <div className='flex min-h-screen bg-foundation-background text-foundation-primary'>
+    <div className='flex h-screen overflow-hidden bg-foundation-primaryLight/20 text-foundation-primary'>
       <Sidebar />
-      <main className='flex-1 flex flex-col'>
-        <div className='pt-20 pb-16 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full'>
-          <div className='flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
-            <div>
-              <h1 className='text-2xl sm:text-3xl font-bold'>Applications</h1>
-              <p className='text-sm text-slate-600'>Job ID: {id || '—'}</p>
+      <main className='flex-1 flex flex-col pt-20 overflow-hidden'>
+        <div className='w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-6 flex-1 flex flex-col overflow-hidden'>
+          <section className='shrink-0 rounded-2xl p-5 sm:p-6 shadow-md bg-gradient-to-r from-foundation-primary to-foundation-blue text-white'>
+            <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+              <div>
+                <h1 className='text-2xl sm:text-3xl font-extrabold tracking-tight'>
+                  Applications
+                </h1>
+                <p className='text-white/80 text-sm'>Job ID: {id || '—'}</p>
+              </div>
+              <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 w-full md:w-auto'>
+                <div className='rounded-xl bg-white/10 backdrop-blur px-4 py-3 text-center'>
+                  <p className='text-xs text-white/80'>Total</p>
+                  <p className='text-lg font-bold'>{stats.total}</p>
+                </div>
+                <div className='rounded-xl bg-white/10 backdrop-blur px-4 py-3 text-center'>
+                  <p className='text-xs text-white/80'>Under Review</p>
+                  <p className='text-lg font-bold'>{stats.under}</p>
+                </div>
+                <div className='rounded-xl bg-white/10 backdrop-blur px-4 py-3 text-center'>
+                  <p className='text-xs text-white/80'>Shortlisted</p>
+                  <p className='text-lg font-bold'>{stats.short}</p>
+                </div>
+                <div className='rounded-xl bg-white/10 backdrop-blur px-4 py-3 text-center'>
+                  <p className='text-xs text-white/80'>Interviewed</p>
+                  <p className='text-lg font-bold'>{stats.interview}</p>
+                </div>
+              </div>
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 w-full md:w-auto'>
-              <div className='relative'>
-                <Search
-                  className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-500'
-                  size={16}
-                />
+          </section>
+
+          <section className='shrink-0 mt-4 rounded-2xl bg-white ring-1 ring-slate-200 shadow-sm p-4 sm:p-5'>
+            <div className='flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4'>
+              <div className='relative w-full xl:w-96'>
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400' />
                 <input
                   type='text'
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder='Search by name or email…'
-                  className='w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-foundation-blue/30'
+                  className='w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-foundation-blue/40'
                   aria-label='Search applications'
                 />
               </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-foundation-blue/30'
-                aria-label='Filter by status'
-              >
-                <option value='all'>All statuses</option>
-                <option value='Under Review'>Under Review</option>
-                <option value='Shortlisted'>Shortlisted</option>
-                <option value='Interviewed'>Interviewed</option>
-                <option value='Rejected'>Rejected</option>
-              </select>
-              <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-foundation-blue/30'
-                aria-label='Sort'
-              >
-                <option value='newest'>Newest first</option>
-                <option value='oldest'>Oldest first</option>
-              </select>
-            </div>
-          </div>
-
-          <div className='mt-5 grid grid-cols-2 sm:grid-cols-5 gap-3'>
-            <div className='rounded-2xl bg-white ring-1 ring-slate-200 p-3 text-center'>
-              <div className='text-xs text-slate-500'>Total</div>
-              <div className='text-xl font-semibold'>{stats.total}</div>
-            </div>
-            <div className='rounded-2xl bg-white ring-1 ring-slate-200 p-3 text-center'>
-              <div className='text-xs text-slate-500'>Under Review</div>
-              <div className='text-xl font-semibold'>{stats.under}</div>
-            </div>
-            <div className='rounded-2xl bg-white ring-1 ring-slate-200 p-3 text-center'>
-              <div className='text-xs text-slate-500'>Shortlisted</div>
-              <div className='text-xl font-semibold'>{stats.short}</div>
-            </div>
-            <div className='rounded-2xl bg-white ring-1 ring-slate-200 p-3 text-center'>
-              <div className='text-xs text-slate-500'>Interviewed</div>
-              <div className='text-xl font-semibold'>{stats.interview}</div>
-            </div>
-            <div className='rounded-2xl bg-white ring-1 ring-slate-200 p-3 text-center'>
-              <div className='text-xs text-slate-500'>Rejected</div>
-              <div className='text-xl font-semibold'>{stats.reject}</div>
-            </div>
-          </div>
-
-          {/* Desktop/Tablet (md+) */}
-          <div className='mt-6 hidden md:block rounded-2xl bg-white shadow-sm ring-1 ring-slate-200'>
-            <div className='overflow-x-auto'>
-              <table className='min-w-full table-auto text-left text-sm'>
-                <thead className='bg-gradient-to-r from-foundation-primary to-foundation-blue text-white'>
-                  <tr>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      Applicant
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      Email
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      Status
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      Salary
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      Start
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      Exp (yrs)
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      CV
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
-                      LinkedIn
-                    </th>
-                    <th className='px-4 lg:px-6 py-3 lg:py-4 text-center font-semibold'>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className='align-top'>
-                  {loading && applications.length === 0 ? (
-                    Array(6)
-                      .fill(0)
-                      .map((_, i) => (
-                        <tr key={i} className='border-b'>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={160} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={220} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={100} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={80} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={100} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={60} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={60} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Skeleton width={80} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4 text-center'>
-                            <Skeleton width={160} height={28} />
-                          </td>
-                        </tr>
-                      ))
-                  ) : filtered.length === 0 ? (
-                    <tr>
-                      <td colSpan='9' className='py-12 text-center'>
-                        <div className='mx-auto max-w-md space-y-2'>
-                          <p className='text-lg font-medium'>
-                            No applications found
-                          </p>
-                          <p className='text-slate-600 text-sm'>
-                            Try adjusting your search or filters.
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    filtered.map((a) => {
-                      const { name, email } = getUserInfo(a)
-                      const salary =
-                        a.expectedSalary != null ? a.expectedSalary : '—'
-                      const start = a.startDate
-                        ? new Date(a.startDate).toLocaleDateString()
-                        : '—'
-                      const exp =
-                        a.experienceYears != null ? a.experienceYears : '—'
-                      return editingId === a._id ? (
-                        <tr key={a._id} className='bg-slate-50 border-b'>
-                          <td className='px-4 lg:px-6 py-4'>{name}</td>
-                          <td className='px-4 lg:px-6 py-4 break-all'>
-                            {email}
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <Select
-                              name='status'
-                              value={formData.status}
-                              onChange={handleChange}
-                            >
-                              <SelectItem value='Under Review'>
-                                Under Review
-                              </SelectItem>
-                              <SelectItem value='Shortlisted'>
-                                Shortlisted
-                              </SelectItem>
-                              <SelectItem value='Interviewed'>
-                                Interviewed
-                              </SelectItem>
-                              <SelectItem value='Rejected'>Rejected</SelectItem>
-                            </Select>
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>{salary}</td>
-                          <td className='px-4 lg:px-6 py-4'>{start}</td>
-                          <td className='px-4 lg:px-6 py-4'>{exp}</td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            {a.cv ? (
-                              <a
-                                href={a.cv}
-                                target='_blank'
-                                rel='noreferrer'
-                                className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
-                              >
-                                <FileText size={16} />
-                                Open
-                              </a>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            {a.linkedIn ? (
-                              <a
-                                href={a.linkedIn}
-                                target='_blank'
-                                rel='noreferrer'
-                                className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
-                              >
-                                <LinkIcon size={16} />
-                                Profile
-                              </a>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <div className='flex flex-wrap items-center justify-center gap-2'>
-                              <Btn
-                                onClick={handleUpdate}
-                                variant='primary'
-                                size='md'
-                              >
-                                Save
-                              </Btn>
-                              <Btn
-                                onClick={() => setEditingId(null)}
-                                variant='outline'
-                                size='md'
-                              >
-                                Cancel
-                              </Btn>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr key={a._id} className='hover:bg-slate-50 border-b'>
-                          <td className='px-4 lg:px-6 py-4'>{name}</td>
-                          <td className='px-4 lg:px-6 py-4 break-all'>
-                            <a
-                              href={`mailto:${email}`}
-                              className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
-                            >
-                              <Mail size={16} />
-                              <span className='truncate'>{email}</span>
-                            </a>
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <StatusBadge value={a.status} />
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>{salary}</td>
-                          <td className='px-4 lg:px-6 py-4'>{start}</td>
-                          <td className='px-4 lg:px-6 py-4'>{exp}</td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            {a.cv ? (
-                              <a
-                                href={a.cv}
-                                target='_blank'
-                                rel='noreferrer'
-                                className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
-                              >
-                                <FileText size={16} />
-                                Open
-                              </a>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            {a.linkedIn ? (
-                              <a
-                                href={a.linkedIn}
-                                target='_blank'
-                                rel='noreferrer'
-                                className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
-                              >
-                                <LinkIcon size={16} />
-                                Profile
-                              </a>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td className='px-4 lg:px-6 py-4'>
-                            <div className='flex flex-wrap items-center justify-center gap-2'>
-                              <Btn
-                                onClick={() => handleEditClick(a)}
-                                variant='subtle'
-                                size='md'
-                                icon={Edit3}
-                              >
-                                Edit
-                              </Btn>
-                              <Btn
-                                onClick={() => handleDelete(a._id)}
-                                variant='danger'
-                                size='md'
-                                icon={Trash2}
-                              >
-                                Delete
-                              </Btn>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Mobile (sm and down) */}
-          <div className='md:hidden space-y-4 mt-6'>
-            {loading && applications.length === 0 ? (
-              Array(5)
-                .fill(0)
-                .map((_, i) => (
-                  <div
-                    key={i}
-                    className='bg-white rounded-2xl shadow-sm p-4 space-y-3 ring-1 ring-slate-200'
-                  >
-                    <Skeleton height={20} width='60%' />
-                    <Skeleton height={16} width='80%' />
-                    <Skeleton height={16} width='40%' />
-                    <div className='flex gap-2'>
-                      <Skeleton height={36} width={80} />
-                      <Skeleton height={36} width={80} />
-                    </div>
-                  </div>
-                ))
-            ) : filtered.length === 0 ? (
-              <div className='bg-white rounded-2xl shadow-sm p-6 ring-1 ring-slate-200 text-center'>
-                <p className='text-base font-medium'>No applications found</p>
-                <p className='text-slate-600 text-sm mt-1'>
-                  Try adjusting your search or filters.
-                </p>
+              <div className='-mx-1 px-1 flex items-center gap-2 overflow-x-auto'>
+                <StatusTab value='all' label='all' count={stats.total} />
+                <StatusTab
+                  value='Under Review'
+                  label='Under Review'
+                  count={stats.under}
+                />
+                <StatusTab
+                  value='Shortlisted'
+                  label='Shortlisted'
+                  count={stats.short}
+                />
+                <StatusTab
+                  value='Interviewed'
+                  label='Interviewed'
+                  count={stats.interview}
+                />
+                <StatusTab
+                  value='Rejected'
+                  label='Rejected'
+                  count={stats.reject}
+                />
               </div>
-            ) : (
-              filtered.map((a) => {
-                const { name, email } = getUserInfo(a)
-                const salary = a.expectedSalary != null ? a.expectedSalary : '—'
-                const start = a.startDate
-                  ? new Date(a.startDate).toLocaleDateString()
-                  : '—'
-                const exp = a.experienceYears != null ? a.experienceYears : '—'
-                return editingId === a._id ? (
-                  <div
-                    key={a._id}
-                    className='bg-slate-50 p-4 rounded-2xl shadow-sm ring-1 ring-slate-200 space-y-3'
-                  >
-                    <div className='text-sm'>
-                      <span className='font-semibold'>Applicant:</span> {name}
-                    </div>
-                    <div className='text-sm break-all'>
-                      <span className='font-semibold'>Email:</span> {email}
-                    </div>
-                    <Select
-                      name='status'
-                      value={formData.status}
-                      onChange={handleChange}
+              <div className='flex gap-3'>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className='rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-foundation-blue/40'
+                  aria-label='Sort'
+                >
+                  <option value='newest'>Newest first</option>
+                  <option value='oldest'>Oldest first</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {/* Desktop/tablet scrollable card */}
+          <div className='hidden md:flex flex-1 min-h-0 mt-4'>
+            <div className='w-full rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 flex-1 min-h-0 overflow-hidden'>
+              <div className='w-full h-full overflow-y-auto'>
+                <table className='min-w-[900px] w-full table-auto text-left text-sm'>
+                  <thead className='bg-gradient-to-r from-foundation-primary to-foundation-blue text-white sticky top-0 z-10'>
+                    <tr>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        Applicant
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        Email
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        Status
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        Salary
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        Start
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        Exp (yrs)
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        CV
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 font-semibold'>
+                        LinkedIn
+                      </th>
+                      <th className='px-4 lg:px-6 py-3 lg:py-4 text-center font-semibold'>
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className='align-top'>
+                    {loading && applications.length === 0 ? (
+                      Array(6)
+                        .fill(0)
+                        .map((_, i) => (
+                          <tr key={i} className='border-b'>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={160} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={220} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={100} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={80} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={100} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={60} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={60} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Skeleton width={80} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4 text-center'>
+                              <Skeleton width={160} height={28} />
+                            </td>
+                          </tr>
+                        ))
+                    ) : filtered.length === 0 ? (
+                      <tr>
+                        <td colSpan='9' className='py-12 text-center'>
+                          <div className='mx-auto max-w-md space-y-2'>
+                            <p className='text-lg font-medium'>
+                              No applications found
+                            </p>
+                            <p className='text-slate-600 text-sm'>
+                              Try adjusting your search or filters.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      filtered.map((a) => {
+                        const { name, email } = getUserInfo(a)
+                        const salary =
+                          a.expectedSalary != null ? a.expectedSalary : '—'
+                        const start = a.startDate
+                          ? new Date(a.startDate).toLocaleDateString()
+                          : '—'
+                        const exp =
+                          a.experienceYears != null ? a.experienceYears : '—'
+                        return editingId === a._id ? (
+                          <tr key={a._id} className='bg-slate-50 border-b'>
+                            <td className='px-4 lg:px-6 py-4'>{name}</td>
+                            <td className='px-4 lg:px-6 py-4 break-all'>
+                              {email}
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <Select
+                                name='status'
+                                value={formData.status}
+                                onChange={handleChange}
+                              >
+                                <SelectItem value='Under Review'>
+                                  Under Review
+                                </SelectItem>
+                                <SelectItem value='Shortlisted'>
+                                  Shortlisted
+                                </SelectItem>
+                                <SelectItem value='Interviewed'>
+                                  Interviewed
+                                </SelectItem>
+                                <SelectItem value='Rejected'>
+                                  Rejected
+                                </SelectItem>
+                              </Select>
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>{salary}</td>
+                            <td className='px-4 lg:px-6 py-4'>{start}</td>
+                            <td className='px-4 lg:px-6 py-4'>{exp}</td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              {a.cv ? (
+                                <a
+                                  href={a.cv}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
+                                >
+                                  <FileText size={16} /> Open
+                                </a>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              {a.linkedIn ? (
+                                <a
+                                  href={a.linkedIn}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
+                                >
+                                  <LinkIcon size={16} /> Profile
+                                </a>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <div className='flex flex-wrap items-center justify-center gap-2'>
+                                <Btn
+                                  onClick={handleUpdate}
+                                  variant='primary'
+                                  size='md'
+                                >
+                                  Save
+                                </Btn>
+                                <Btn
+                                  onClick={() => setEditingId(null)}
+                                  variant='outline'
+                                  size='md'
+                                >
+                                  Cancel
+                                </Btn>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr
+                            key={a._id}
+                            className='hover:bg-slate-50 border-b'
+                          >
+                            <td className='px-4 lg:px-6 py-4'>{name}</td>
+                            <td className='px-4 lg:px-6 py-4 break-all'>
+                              <a
+                                href={`mailto:${email}`}
+                                className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
+                              >
+                                <Mail size={16} />
+                                <span className='truncate'>{email}</span>
+                              </a>
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <StatusBadge value={a.status} />
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>{salary}</td>
+                            <td className='px-4 lg:px-6 py-4'>{start}</td>
+                            <td className='px-4 lg:px-6 py-4'>{exp}</td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              {a.cv ? (
+                                <a
+                                  href={a.cv}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
+                                >
+                                  <FileText size={16} /> Open
+                                </a>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              {a.linkedIn ? (
+                                <a
+                                  href={a.linkedIn}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='inline-flex items-center gap-1 text-foundation-blue hover:underline'
+                                >
+                                  <LinkIcon size={16} /> Profile
+                                </a>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                            <td className='px-4 lg:px-6 py-4'>
+                              <div className='flex flex-wrap items-center justify-center gap-2'>
+                                <Btn
+                                  onClick={() => handleEditClick(a)}
+                                  variant='subtle'
+                                  size='md'
+                                  icon={Edit3}
+                                >
+                                  Edit
+                                </Btn>
+                                <Btn
+                                  onClick={() => handleDelete(a._id)}
+                                  variant='danger'
+                                  size='md'
+                                  icon={Trash2}
+                                >
+                                  Delete
+                                </Btn>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile: one scrollable card list */}
+          <div className='md:hidden flex-1 min-h-0 mt-4'>
+            <div className='h-full overflow-y-auto space-y-4 pr-1'>
+              {loading && applications.length === 0 ? (
+                Array(5)
+                  .fill(0)
+                  .map((_, i) => (
+                    <div
+                      key={i}
+                      className='bg-white rounded-2xl shadow-sm p-4 space-y-3 ring-1 ring-slate-200'
                     >
-                      <SelectItem value='Under Review'>Under Review</SelectItem>
-                      <SelectItem value='Shortlisted'>Shortlisted</SelectItem>
-                      <SelectItem value='Interviewed'>Interviewed</SelectItem>
-                      <SelectItem value='Rejected'>Rejected</SelectItem>
-                    </Select>
-                    <div className='grid grid-cols-2 gap-2'>
-                      <Btn
-                        onClick={handleUpdate}
-                        variant='primary'
-                        className='w-full'
-                      >
-                        Save
-                      </Btn>
-                      <Btn
-                        onClick={() => setEditingId(null)}
-                        variant='outline'
-                        className='w-full'
-                      >
-                        Cancel
-                      </Btn>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    key={a._id}
-                    className='bg-white rounded-2xl shadow-sm p-4 ring-1 ring-slate-200 space-y-3'
-                  >
-                    <div className='flex items-start justify-between gap-2'>
-                      <div className='min-w-0'>
-                        <p className='font-semibold text-lg truncate'>{name}</p>
-                        <a
-                          href={`mailto:${email}`}
-                          className='inline-flex items-center gap-1 text-sm text-foundation-blue break-all'
-                        >
-                          <Mail size={16} />
-                          {email}
-                        </a>
+                      <Skeleton height={20} width='60%' />
+                      <Skeleton height={16} width='80%' />
+                      <Skeleton height={16} width='40%' />
+                      <div className='flex gap-2'>
+                        <Skeleton height={36} width={80} />
+                        <Skeleton height={36} width={80} />
                       </div>
-                      <StatusBadge value={a.status} />
                     </div>
-                    <div className='flex flex-wrap items-center gap-3 text-xs text-slate-600'>
-                      <span>Salary: {salary}</span>
-                      <span>Start: {start}</span>
-                      <span>Exp: {exp} yrs</span>
-                    </div>
-                    <div className='grid grid-cols-2 gap-2'>
-                      {a.cv ? (
-                        <a
-                          href={a.cv}
-                          target='_blank'
-                          rel='noreferrer'
-                          className='inline-flex items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700'
-                        >
-                          <FileText size={16} /> CV
-                        </a>
-                      ) : (
-                        <div className='inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500'>
-                          No CV
-                        </div>
-                      )}
-                      {a.linkedIn ? (
-                        <a
-                          href={a.linkedIn}
-                          target='_blank'
-                          rel='noreferrer'
-                          className='inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700'
-                        >
-                          <LinkIcon size={16} /> LinkedIn
-                        </a>
-                      ) : (
-                        <div className='inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500'>
-                          No Profile
-                        </div>
-                      )}
-                    </div>
-                    <div className='grid grid-cols-2 gap-2'>
-                      <Btn
-                        onClick={() => handleEditClick(a)}
-                        variant='subtle'
-                        className='w-full'
-                        icon={Edit3}
+                  ))
+              ) : filtered.length === 0 ? (
+                <div className='bg-white rounded-2xl shadow-sm p-6 ring-1 ring-slate-200 text-center'>
+                  <p className='text-base font-medium'>No applications found</p>
+                  <p className='text-slate-600 text-sm mt-1'>
+                    Try adjusting your search or filters.
+                  </p>
+                </div>
+              ) : (
+                filtered.map((a) => {
+                  const { name, email } = getUserInfo(a)
+                  const salary =
+                    a.expectedSalary != null ? a.expectedSalary : '—'
+                  const start = a.startDate
+                    ? new Date(a.startDate).toLocaleDateString()
+                    : '—'
+                  const exp =
+                    a.experienceYears != null ? a.experienceYears : '—'
+                  return editingId === a._id ? (
+                    <div
+                      key={a._id}
+                      className='bg-slate-50 p-4 rounded-2xl shadow-sm ring-1 ring-slate-200 space-y-3'
+                    >
+                      <div className='text-sm'>
+                        <span className='font-semibold'>Applicant:</span> {name}
+                      </div>
+                      <div className='text-sm break-all'>
+                        <span className='font-semibold'>Email:</span> {email}
+                      </div>
+                      <Select
+                        name='status'
+                        value={formData.status}
+                        onChange={handleChange}
                       >
-                        Edit
-                      </Btn>
-                      <Btn
-                        onClick={() => handleDelete(a._id)}
-                        variant='danger'
-                        className='w-full'
-                        icon={Trash2}
-                      >
-                        Delete
-                      </Btn>
+                        <SelectItem value='Under Review'>
+                          Under Review
+                        </SelectItem>
+                        <SelectItem value='Shortlisted'>Shortlisted</SelectItem>
+                        <SelectItem value='Interviewed'>Interviewed</SelectItem>
+                        <SelectItem value='Rejected'>Rejected</SelectItem>
+                      </Select>
+                      <div className='grid grid-cols-2 gap-2'>
+                        <Btn
+                          onClick={handleUpdate}
+                          variant='primary'
+                          className='w-full'
+                        >
+                          Save
+                        </Btn>
+                        <Btn
+                          onClick={() => setEditingId(null)}
+                          variant='outline'
+                          className='w-full'
+                        >
+                          Cancel
+                        </Btn>
+                      </div>
                     </div>
-                  </div>
-                )
-              })
-            )}
+                  ) : (
+                    <div
+                      key={a._id}
+                      className='bg-white rounded-2xl shadow-sm p-4 ring-1 ring-slate-200 space-y-3'
+                    >
+                      <div className='flex items-start justify-between gap-2'>
+                        <div className='min-w-0'>
+                          <p className='font-semibold text-lg truncate'>
+                            {name}
+                          </p>
+                          <a
+                            href={`mailto:${email}`}
+                            className='inline-flex items-center gap-1 text-sm text-foundation-blue break-all'
+                          >
+                            <Mail size={16} />
+                            {email}
+                          </a>
+                        </div>
+                        <StatusBadge value={a.status} />
+                      </div>
+                      <div className='flex flex-wrap items-center gap-3 text-xs text-slate-600'>
+                        <span>Salary: {salary}</span>
+                        <span>Start: {start}</span>
+                        <span>Exp: {exp} yrs</span>
+                      </div>
+                      <div className='grid grid-cols-2 gap-2'>
+                        {a.cv ? (
+                          <a
+                            href={a.cv}
+                            target='_blank'
+                            rel='noreferrer'
+                            className='inline-flex items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700'
+                          >
+                            <FileText size={16} /> CV
+                          </a>
+                        ) : (
+                          <div className='inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500'>
+                            No CV
+                          </div>
+                        )}
+                        {a.linkedIn ? (
+                          <a
+                            href={a.linkedIn}
+                            target='_blank'
+                            rel='noreferrer'
+                            className='inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700'
+                          >
+                            <LinkIcon size={16} /> LinkedIn
+                          </a>
+                        ) : (
+                          <div className='inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500'>
+                            No Profile
+                          </div>
+                        )}
+                      </div>
+                      <div className='grid grid-cols-2 gap-2'>
+                        <Btn
+                          onClick={() => handleEditClick(a)}
+                          variant='subtle'
+                          className='w-full'
+                          icon={Edit3}
+                        >
+                          Edit
+                        </Btn>
+                        <Btn
+                          onClick={() => handleDelete(a._id)}
+                          variant='danger'
+                          className='w-full'
+                          icon={Trash2}
+                        >
+                          Delete
+                        </Btn>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
           </div>
         </div>
       </main>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, memo } from 'react'
 import { useRouter } from 'next/router'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Input from '@/components/ui/Input'
@@ -10,30 +10,119 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import api from '@/utils/api'
 import { parseJwt } from '@/utils/parseJWT'
 
+function Section({ title, subtitle, children }) {
+  return (
+    <section className='rounded-2xl border border-foundation-pale bg-white shadow-sm overflow-hidden'>
+      <div className='bg-gradient-to-r from-blue-50 to-slate-50 px-5 py-4'>
+        <h2 className='text-lg font-semibold text-foundation-primary'>
+          {title}
+        </h2>
+        {subtitle && (
+          <p className='text-sm text-slate-600 mt-0.5'>{subtitle}</p>
+        )}
+      </div>
+      <div className='p-5 space-y-5'>{children}</div>
+    </section>
+  )
+}
+
+const ArrayField = memo(function ArrayField({
+  form,
+  field,
+  label,
+  hint,
+  onChange,
+  onAdd,
+  onRemove,
+}) {
+  return (
+    <div>
+      <div className='flex items-baseline justify-between mb-2'>
+        <label className='font-semibold'>{label}</label>
+        {hint && <span className='text-xs text-slate-500'>{hint}</span>}
+      </div>
+      <div className='space-y-2'>
+        {form[field].map((item, index) => (
+          <div
+            key={`${field}-${index}`}
+            className='flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2'
+          >
+            <span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold'>
+              {index + 1}
+            </span>
+            <Input
+              value={item}
+              onChange={(e) => onChange(e, field, index)}
+              className='flex-1 bg-white'
+              placeholder={`Enter ${label.toLowerCase().replace(/s$/, '')}...`}
+            />
+            {form[field].length > 1 && (
+              <button
+                type='button'
+                onClick={() => onRemove(field, index)}
+                className='inline-flex items-center rounded-lg px-2.5 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 transition'
+                aria-label='Remove item'
+                title='Remove'
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className='mt-3'>
+        <Button
+          type='button'
+          onClick={() => onAdd(field)}
+          className='inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'
+        >
+          <span className='text-lg leading-none'>＋</span> Add{' '}
+          {label.split(' ')[0]}
+        </Button>
+      </div>
+    </div>
+  )
+})
+
 export default function CreateJobPage() {
   const router = useRouter()
   const [authorized, setAuthorized] = useState(null)
-
   const [form, setForm] = useState({
-    title: '',
-    company: '',
-    location: '',
-    type: '',
-    salary: '',
-    department: '',
-    companyOverview: '',
-    jobSummary: '',
-    keyResponsibilities: [''],
-    requiredQualifications: [''],
-    preferredQualifications: [''],
-    benefits: [''],
-    howToApply: '',
+    title: 'Software Engineer',
+    company: 'TechCorp Ltd',
+    location: 'London, UK',
+    type: 'Full-Time',
+    salary: '£45,000–£55,000',
+    department: 'Engineering',
+    companyOverview:
+      'TechCorp is a fast-growing software company focused on building scalable solutions for businesses worldwide.',
+    jobSummary:
+      'We are seeking a talented Software Engineer to join our engineering team and contribute to developing our flagship platform.',
+    keyResponsibilities: [
+      'Develop and maintain web applications',
+      'Collaborate with cross-functional teams',
+      'Write clean and efficient code',
+    ],
+    requiredQualifications: [
+      'Bachelor’s degree in Computer Science or related field',
+      'Proficiency in JavaScript and React',
+    ],
+    preferredQualifications: [
+      'Experience with Next.js',
+      'Familiarity with cloud platforms',
+    ],
+    benefits: [
+      'Health insurance',
+      'Flexible working hours',
+      'Remote work options',
+    ],
+    skills: ['React', 'JavaScript', 'Next.js'],
+    howToApply: 'Send your CV to careers@techcorp.com',
   })
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     const user = parseJwt(token)
-
     if (!user || (user.role !== 'admin' && user.role !== 'employer')) {
       toast.error('Unauthorized: Admins or Employers only')
       setAuthorized(false)
@@ -55,10 +144,7 @@ export default function CreateJobPage() {
   }
 
   const addField = (field) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: [...prev[field], ''],
-    }))
+    setForm((prev) => ({ ...prev, [field]: [...prev[field], ''] }))
   }
 
   const removeField = (field, index) => {
@@ -69,16 +155,14 @@ export default function CreateJobPage() {
 
   const isFormValid = () => {
     const requiredFields = ['title', 'company', 'location', 'type', 'salary']
-
     const hasEmptyRequiredField = requiredFields.some(
       (field) => !form[field]?.trim()
     )
-
     const hasEmptyArrayField = [
       'keyResponsibilities',
       'requiredQualifications',
+      'skills',
     ].some((field) => form[field].some((item) => !item.trim()))
-
     return !hasEmptyRequiredField && !hasEmptyArrayField
   }
 
@@ -89,78 +173,21 @@ export default function CreateJobPage() {
       return
     }
     try {
-      await api.post('/vacancy', form)
+      const token = localStorage.getItem('token')
+      const user = parseJwt(token)
+      await api.post('/vacancy', form, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       toast.success('Job post created')
-      router.push('/admin/jobs')
+      if (user?.role === 'employer') {
+        router.push('/employer/jobs')
+      } else {
+        router.push('/admin/jobs')
+      }
     } catch (err) {
-      console.error(err)
       toast.error(err.response?.data?.error || 'Failed to create job')
     }
   }
-
-  const Section = ({ title, subtitle, children }) => (
-    <section className='rounded-2xl border border-foundation-pale bg-white shadow-sm overflow-hidden'>
-      <div className='bg-gradient-to-r from-blue-50 to-slate-50 px-5 py-4'>
-        <h2 className='text-lg font-semibold text-foundation-primary'>
-          {title}
-        </h2>
-        {subtitle && (
-          <p className='text-sm text-slate-600 mt-0.5'>{subtitle}</p>
-        )}
-      </div>
-      <div className='p-5 space-y-5'>{children}</div>
-    </section>
-  )
-
-  const ArrayField = ({ field, label, hint }) => (
-    <div>
-      <div className='flex items-baseline justify-between mb-2'>
-        <label className='font-semibold'>{label}</label>
-        {hint && <span className='text-xs text-slate-500'>{hint}</span>}
-      </div>
-
-      <div className='space-y-2'>
-        {form[field].map((item, index) => (
-          <div
-            key={`${field}-${index}`}
-            className='flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2'
-          >
-            <span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold'>
-              {index + 1}
-            </span>
-            <Input
-              value={item}
-              onChange={(e) => handleArrayChange(e, field, index)}
-              className='flex-1 bg-white'
-              placeholder={`Enter ${label.toLowerCase().replace(/s$/, '')}...`}
-            />
-            {form[field].length > 1 && (
-              <button
-                type='button'
-                onClick={() => removeField(field, index)}
-                className='inline-flex items-center rounded-lg px-2.5 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 transition'
-                aria-label='Remove item'
-                title='Remove'
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className='mt-3'>
-        <Button
-          type='button'
-          onClick={() => addField(field)}
-          className='inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'
-        >
-          <span className='text-lg leading-none'>＋</span> Add{' '}
-          {label.split(' ')[0]}
-        </Button>
-      </div>
-    </div>
-  )
 
   if (authorized === null) {
     return (
@@ -183,7 +210,6 @@ export default function CreateJobPage() {
     <div className='flex flex-col sm:flex-row h-screen bg-foundation-background text-foundation-primary'>
       <Sidebar />
       <main className='flex-1 w-full overflow-auto'>
-        {/* Sticky header */}
         <div className='sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur'>
           <div className='mx-auto max-w-5xl px-4 sm:px-8 py-4 flex items-center justify-between'>
             <div>
@@ -222,7 +248,6 @@ export default function CreateJobPage() {
             onSubmit={handleSubmit}
             className='space-y-6'
           >
-            {/* Overview */}
             <Section
               title='Job Overview'
               subtitle='Core details candidates will see first.'
@@ -273,7 +298,6 @@ export default function CreateJobPage() {
               </div>
             </Section>
 
-            {/* Descriptions */}
             <Section
               title='Descriptions'
               subtitle='Help candidates quickly understand the role and your company.'
@@ -294,32 +318,59 @@ export default function CreateJobPage() {
               />
             </Section>
 
-            {/* Responsibilities & Qualifications */}
             <Section
-              title='Responsibilities & Qualifications'
+              title='Responsibilities, Qualifications & Skills'
               subtitle='List the essentials first for clarity.'
             >
               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                 <ArrayField
+                  form={form}
                   field='keyResponsibilities'
                   label='Key Responsibilities'
                   hint='Minimum 1 item required'
+                  onChange={handleArrayChange}
+                  onAdd={addField}
+                  onRemove={removeField}
                 />
                 <ArrayField
+                  form={form}
                   field='requiredQualifications'
                   label='Required Qualifications'
                   hint='Minimum 1 item required'
+                  onChange={handleArrayChange}
+                  onAdd={addField}
+                  onRemove={removeField}
                 />
                 <ArrayField
+                  form={form}
                   field='preferredQualifications'
                   label='Preferred Qualifications'
                   hint='Optional'
+                  onChange={handleArrayChange}
+                  onAdd={addField}
+                  onRemove={removeField}
                 />
-                <ArrayField field='benefits' label='Benefits' hint='Optional' />
+                <ArrayField
+                  form={form}
+                  field='benefits'
+                  label='Benefits'
+                  hint='Optional'
+                  onChange={handleArrayChange}
+                  onAdd={addField}
+                  onRemove={removeField}
+                />
+                <ArrayField
+                  form={form}
+                  field='skills'
+                  label='Skills'
+                  hint='Minimum 1 item required'
+                  onChange={handleArrayChange}
+                  onAdd={addField}
+                  onRemove={removeField}
+                />
               </div>
             </Section>
 
-            {/* Apply */}
             <Section
               title='Application'
               subtitle='Tell candidates how to apply.'
@@ -333,7 +384,6 @@ export default function CreateJobPage() {
               />
             </Section>
 
-            {/* Bottom action bar (mobile-friendly) */}
             <div className='sticky bottom-4 z-10'>
               <div className='mx-auto max-w-5xl'>
                 <div className='rounded-2xl border border-slate-200 bg-white/90 backdrop-blur px-4 py-3 shadow-lg flex items-center justify-between'>
@@ -367,7 +417,6 @@ export default function CreateJobPage() {
             </div>
           </form>
 
-          {/* Helpful tips card */}
           <div className='rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-700'>
             <div className='font-semibold mb-2'>Tips for a standout post</div>
             <ul className='list-disc list-inside space-y-1'>
