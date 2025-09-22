@@ -177,13 +177,12 @@ export default function Login() {
                   Welcome back
                 </div>
                 <div className='text-sm text-[#3D52A0]/80'>
-                  Access your profile, applications, and tailored matches.
+                  Access your profile.
                 </div>
               </div>
               <ul className='mt-8 space-y-3 text-sm text-[#3D52A0]/80'>
                 <li className='flex items-start gap-3'>
                   <span className='mt-1 h-2 w-2 rounded-full bg-[#7091E6]' />
-                  Smooth sign-in with clean UI
                 </li>
                 <li className='flex items-start gap-3'>
                   <span className='mt-1 h-2 w-2 rounded-full bg-[#3D52A0]' />
@@ -191,7 +190,6 @@ export default function Login() {
                 </li>
                 <li className='flex items-start gap-3'>
                   <span className='mt-1 h-2 w-2 rounded-full bg-[#B8C1EC]' />
-                  Subtle motion and feedback
                 </li>
               </ul>
             </div>

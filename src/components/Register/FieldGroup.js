@@ -1,4 +1,3 @@
-// components/form/FieldGroup.js
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 

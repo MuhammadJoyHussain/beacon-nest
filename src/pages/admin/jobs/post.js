@@ -100,7 +100,7 @@ export default function CreateJobPage() {
     requiredQualifications: [''],
     preferredQualifications: [''],
     benefits: [''],
-    skills: [''], // 👈 added skills
+    skills: [''],
     howToApply: '',
   })
 
@@ -145,7 +145,7 @@ export default function CreateJobPage() {
     const hasEmptyArrayField = [
       'keyResponsibilities',
       'requiredQualifications',
-      'skills', // 👈 include skills
+      'skills',
     ].some((field) => form[field].some((item) => !item.trim()))
 
     return !hasEmptyRequiredField && !hasEmptyArrayField

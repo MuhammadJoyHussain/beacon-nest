@@ -1,4 +1,3 @@
-// components/form/CVUpload.js
 import { FileText } from 'lucide-react'
 
 const CVUpload = ({ onChange, file }) => (

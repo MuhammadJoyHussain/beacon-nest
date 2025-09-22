@@ -46,7 +46,6 @@ const Joblist = () => {
     fetchApplications()
   }, [])
 
-  // Badge colors for statuses
   const statusColors = {
     Pending: 'bg-yellow-100 text-yellow-700',
     Accepted: 'bg-green-100 text-green-700',

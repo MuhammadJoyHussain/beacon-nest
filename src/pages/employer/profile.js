@@ -149,7 +149,6 @@ export default function Profile() {
   )
 }
 
-// Helper for initials
 function getInitials(firstName, lastName) {
   const first = firstName?.[0]?.toUpperCase() || ''
   const last = lastName?.[0]?.toUpperCase() || ''

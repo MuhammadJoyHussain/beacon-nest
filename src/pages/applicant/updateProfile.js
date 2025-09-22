@@ -89,7 +89,6 @@ const UpdateProfile = () => {
     }
   }
 
-  // Icons for each field
   const fieldIcons = {
     phone: <Phone size={18} />,
     street: <MapPin size={18} />,

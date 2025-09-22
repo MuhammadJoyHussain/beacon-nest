@@ -13,8 +13,6 @@ import authApi from '@/utils/authApi'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FileText,
-  Upload,
-  LinkIcon,
   DollarSign,
   Briefcase,
   ArrowRight,
@@ -22,6 +20,7 @@ import {
   MapPin,
   Banknote,
   X,
+  Link as LinkIcon,
 } from 'lucide-react'
 
 export default function ApplyJob() {
@@ -44,7 +43,6 @@ export default function ApplyJob() {
   const [cvFile, setCvFile] = useState(null)
   const [dragging, setDragging] = useState(false)
 
-  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [shake, setShake] = useState(false)
   const [review, setReview] = useState(false)
@@ -70,12 +68,10 @@ export default function ApplyJob() {
         toast.error('Unauthorized. Please login again.')
         localStorage.removeItem('token')
         router.push('/login')
-      } finally {
-        setLoading(false)
       }
     }
     if (id) init()
-  }, [id])
+  }, [id, router])
 
   useEffect(() => {
     if (!id) return
@@ -134,6 +130,33 @@ export default function ApplyJob() {
   const addLink = () => setLinks([...links, ''])
   const removeLink = (i) => setLinks(links.filter((_, idx) => idx !== i))
 
+  const fillWithSample = () => {
+    setCoverLetter(
+      `Dear Hiring Team,
+
+I’m a frontend engineer with a strong focus on UX and performance. In my last role at Acme Corp, I led the rebuild of the candidate dashboard in Next.js and Tailwind, improving FCP by 34% and sign-in conversion by 12%. I enjoy shipping clean, accessible interfaces and collaborating closely with design and product.
+
+I’d love to bring that same energy to your team.
+
+Best regards,
+Jane Doe`
+    )
+    setAdditionalInfo(
+      `Your mission resonates with me. I’ve followed your design system posts and have experience with Framer Motion, Recharts, and server-side rendering in Next.js. I’m UK-based and ready to start soon.`
+    )
+    setExpectedSalary('52000')
+    setCurrency('GBP')
+    const inThreeWeeks = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21)
+      .toISOString()
+      .slice(0, 10)
+    setStartDate(inThreeWeeks)
+    setLinkedIn('https://www.linkedin.com/in/jane-doe-123456/')
+    setLinks(['https://github.com/janedoe', 'https://janedoe.dev'])
+    setExperienceYears('4')
+    setAuthorized(true)
+    toast.success('Sample data loaded')
+  }
+
   const submitApplication = async () => {
     if (!cvFile) {
       setShake(true)
@@ -142,7 +165,6 @@ export default function ApplyJob() {
       return
     }
     const token = localStorage.getItem('token')
-
     const formData = new FormData()
     formData.append('cv', cvFile)
     formData.append('jobId', id)
@@ -244,11 +266,16 @@ export default function ApplyJob() {
             <h1 className='text-3xl font-extrabold text-[#1B2559]'>
               Apply for Job
             </h1>
-            <div className='rounded-xl bg-white/70 backdrop-blur px-4 py-2 ring-1 ring-black/5 border border-white/40 text-sm'>
-              Signed in as{' '}
-              <span className='font-semibold'>
-                {user?.firstName} {user?.lastName}
-              </span>
+            <div className='flex items-center gap-2'>
+              <div className='rounded-xl bg-white/70 backdrop-blur px-4 py-2 ring-1 ring-black/5 border border-white/40 text-sm'>
+                Signed in as{' '}
+                <span className='font-semibold'>
+                  {user?.firstName} {user?.lastName}
+                </span>
+              </div>
+              <Button variant='soft' size='sm' onClick={fillWithSample}>
+                Load sample data
+              </Button>
             </div>
           </div>
 
@@ -452,13 +479,13 @@ export default function ApplyJob() {
       <AnimatePresence>
         {review && (
           <motion.div
-            className='fixed inset-0 z-50 grid place-items-center bg-black/40 p-4'
+            className='fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 overflow-y-auto overscroll-contain'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className='glass-card w-full max-w-2xl p-6'
+              className='glass-card w-full max-w-2xl p-6 max-h-[85vh] overflow-y-auto'
               initial={{ y: 16, scale: 0.98, opacity: 0 }}
               animate={{ y: 0, scale: 1, opacity: 1 }}
               exit={{ y: 16, scale: 0.98, opacity: 0 }}

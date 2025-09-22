@@ -1,38 +1,28 @@
-import { forwardRef } from 'react'
+import React from 'react'
 
-function cn(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
-const Checkbox = forwardRef(function Checkbox(
-  { label, error, className, name, ...props },
-  ref
-) {
-  return (
-    <div className='w-full'>
-      <label className='inline-flex items-start gap-3 cursor-pointer select-none'>
+const Checkbox = React.forwardRef(
+  ({ label, error, className = '', ...props }, ref) => {
+    return (
+      <div className={['flex items-start gap-3', className].join(' ')}>
         <input
           ref={ref}
-          id={name}
-          name={name}
           type='checkbox'
-          className={cn(
-            'h-5 w-5 rounded-md border border-[#ADBBDA] bg-white',
-            'checked:bg-[#3D52A0] checked:border-[#3D52A0]',
-            'transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7091E6]',
-            className
-          )}
           {...props}
+          className='mt-1 h-4 w-4 rounded border-[#E0E6FF] text-[#3D52A0] focus:ring-[#B8C1EC]'
         />
-        <span className='text-sm text-[#1B2559]'>{label}</span>
-      </label>
-      {error && (
-        <p className='mt-1 text-xs text-rose-600'>
-          {error.message || 'Required'}
-        </p>
-      )}
-    </div>
-  )
-})
-
+        <div className='text-sm'>
+          <div className='text-[#1B2559]'>{label}</div>
+          {error ? (
+            <p className='text-red-600 text-xs mt-1'>
+              {typeof error === 'object' && error.message
+                ? error.message
+                : 'This field is required'}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    )
+  }
+)
+Checkbox.displayName = 'Checkbox'
 export default Checkbox

@@ -262,7 +262,6 @@ const ApplicationDetails = () => {
   )
 }
 
-// Reusable styled section
 function Section({ title, children }) {
   return (
     <section className='bg-white rounded-2xl shadow p-6 space-y-3'>

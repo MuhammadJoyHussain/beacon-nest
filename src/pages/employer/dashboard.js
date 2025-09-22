@@ -50,7 +50,6 @@ const EmployerDashboard = () => {
     setLoading(false)
   }
 
-  // summary numbers
   const totalJobs = jobs.length
   const totalApplicants = jobs.reduce(
     (sum, job) => sum + (job.applicants?.length || 0),

@@ -8,7 +8,6 @@ import DatePickerInput from '@/components/ui/DatePickerInput'
 import api from '@/utils/api'
 import authApi from '@/utils/authApi'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -17,7 +16,6 @@ import {
   User,
   Mail,
   Phone,
-  Calendar,
   MapPin,
   Hash,
   Lock,
@@ -28,8 +26,51 @@ import {
   Landmark,
   ChevronRight,
 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+
+const DUMMY = {
+  firstName: 'Alex',
+  lastName: 'Johnson',
+  dob: '1994-03-15',
+  gender: 'Male',
+  shareCode: 'SC-ABC1234',
+
+  email: 'alex.johnson@example.com',
+  phone: '+44 7700 900123',
+
+  street: '221B Baker Street',
+  city: 'London',
+  postcode: 'NW1 6XE',
+  country: 'United Kingdom',
+
+  experience: [
+    {
+      position: 'Frontend Developer',
+      company: 'Acme Ltd',
+      startDate: '2021-05-01',
+      endDate: '2023-10-01',
+      city: 'London',
+      country: 'United Kingdom',
+    },
+  ],
+  skills: ['React', 'Next.js', 'TypeScript'],
+  startDate: '2025-10-01',
+
+  username: 'alex_johnson',
+  password: 'P@ssw0rd123!',
+  confirmPassword: 'P@ssw0rd123!',
+  role: 'user',
+
+  terms: true,
+  gdpr: true,
+}
 
 export default function Register() {
+  const router = useRouter()
+  const [file, setFile] = useState(null)
+  const [shake, setShake] = useState(false)
+  const [step, setStep] = useState(0)
+
   const {
     register,
     handleSubmit,
@@ -37,53 +78,23 @@ export default function Register() {
     setValue,
     watch,
     trigger,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      dob: '',
-      gender: '',
-      email: '',
-      phone: '',
-      street: '',
-      city: '',
-      postcode: '',
-      country: '',
-      employeeExperience: [
-        {
-          position: '',
-          company: '',
-          startDate: '',
-          endDate: '',
-          city: '',
-          country: '',
-        },
-      ],
-      username: '',
-      password: '',
-      confirmPassword: '',
-      shareCode: '',
-      terms: false,
-      gdpr: false,
-      skills: [''],
-    },
+    defaultValues: DUMMY,
   })
 
-  const router = useRouter()
-  const [file, setFile] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [shake, setShake] = useState(false)
-  const [step, setStep] = useState(0)
   const formData = watch()
+  const pw = watch('password')
 
-  const steps = [
-    { key: 'profile', title: 'Profile' },
-    { key: 'contact', title: 'Contact & Address' },
-    { key: 'experience', title: 'Experience & Skills' },
-    { key: 'account', title: 'Account & Policies' },
-  ]
-
+  const steps = useMemo(
+    () => [
+      { key: 'profile', title: 'Profile' },
+      { key: 'contact', title: 'Contact & Address' },
+      { key: 'experience', title: 'Experience & Skills' },
+      { key: 'account', title: 'Account & Policies' },
+    ],
+    []
+  )
   const genders = ['Male', 'Female', 'Other']
   const countries = [
     'United Kingdom',
@@ -97,40 +108,37 @@ export default function Register() {
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files?.[0]
     setFile(selectedFile)
-    if (!selectedFile) return toast.error('Please select a PDF file first')
-    const formDataUpload = new FormData()
-    formDataUpload.append('pdf', selectedFile)
+    if (!selectedFile) {
+      toast.error('Please select a PDF file first')
+      return
+    }
+    const fd = new FormData()
+    fd.append('pdf', selectedFile)
     try {
-      setLoading(true)
-      const res = await api.post('/upload', formDataUpload)
+      const res = await api.post('/upload', fd)
       toast.success('PDF uploaded, form data extracted!')
-      const data = res.data
-      if (data.employeeExperience && data.employeeExperience.length > 0) {
-        const exp = data.employeeExperience[0]
-        setValue('employeeExperience', [
+      const data = res.data || {}
+      if (Array.isArray(data.experience) && data.experience.length) {
+        setValue('experience', [
           {
-            position: exp.position || '',
-            company: exp.company || '',
-            startDate: exp.startDate || '',
-            endDate: exp.endDate?.includes('undefined')
-              ? ''
-              : exp.endDate || '',
-            city: exp.city || '',
-            country: exp.country || '',
+            position: data.experience[0].position || '',
+            company: data.experience[0].company || '',
+            startDate: data.experience[0].startDate || '',
+            endDate: data.experience[0].endDate || '',
+            city: data.experience[0].city || '',
+            country: data.experience[0].country || '',
           },
         ])
       }
-      reset({ ...formData, ...data })
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Error uploading PDF')
-    } finally {
-      setLoading(false)
+      reset({ ...watch(), ...data })
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Error uploading PDF')
     }
   }
 
   const addExperience = () => {
-    setValue('employeeExperience', [
-      ...formData.employeeExperience,
+    setValue('experience', [
+      ...formData.experience,
       {
         position: '',
         company: '',
@@ -142,14 +150,9 @@ export default function Register() {
     ])
   }
   const removeExperience = (index) => {
-    const updated = [...formData.employeeExperience]
+    const updated = [...formData.experience]
     updated.splice(index, 1)
-    setValue('employeeExperience', updated)
-  }
-  const handleExperienceChange = (e, index, field) => {
-    const updated = [...formData.employeeExperience]
-    updated[index][field] = e.target.value
-    setValue('employeeExperience', updated)
+    setValue('experience', updated)
   }
 
   const addSkill = () => setValue('skills', [...formData.skills, ''])
@@ -159,37 +162,17 @@ export default function Register() {
     updated.splice(index, 1)
     setValue('skills', updated)
   }
-  const handleSkillChange = (e, index) => {
-    const updated = [...formData.skills]
-    updated[index] = e.target.value
-    setValue('skills', updated)
-  }
 
   const onSubmit = async (data) => {
-    if (!data.terms || !data.gdpr) {
-      setShake(true)
-      setTimeout(() => setShake(false), 400)
-      toast.error('Please agree to Terms & Conditions and GDPR policy.')
-      return
-    }
-    if (data.password !== data.confirmPassword) {
-      setShake(true)
-      setTimeout(() => setShake(false), 400)
-      toast.error('Passwords do not match.')
-      return
-    }
     try {
-      setLoading(true)
       const { data: resData } = await authApi.post('/auth/register', data)
       localStorage.setItem('token', resData.token)
       toast.success('Registration successful! Redirecting...')
-      setTimeout(() => router.push('/applicant/profile'), 1200)
+      setTimeout(() => router.push('/applicant/profile'), 900)
     } catch (err) {
       setShake(true)
       setTimeout(() => setShake(false), 400)
       toast.error(err?.response?.data?.message || 'Registration failed')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -197,14 +180,18 @@ export default function Register() {
     ['firstName', 'lastName', 'dob', 'gender', 'shareCode'],
     ['email', 'phone', 'street', 'city', 'postcode', 'country'],
     [],
-    ['username', 'password', 'confirmPassword', 'terms', 'gdpr'],
+    ['username', 'password', 'confirmPassword', 'terms', 'gdpr', 'startDate'],
   ]
 
   const nextStep = async () => {
     const fields = stepFields[step]
     if (fields.length) {
       const ok = await trigger(fields)
-      if (!ok) return setShake(true), setTimeout(() => setShake(false), 400)
+      if (!ok) {
+        setShake(true)
+        setTimeout(() => setShake(false), 400)
+        return
+      }
     }
     setStep((s) => Math.min(s + 1, steps.length - 1))
   }
@@ -294,6 +281,18 @@ export default function Register() {
             </aside>
 
             <section className='p-6 md:p-10'>
+              <div className='flex items-center justify-between mb-6'>
+                <div />
+                <Button
+                  type='button'
+                  variant='soft'
+                  onClick={() => reset(DUMMY)}
+                  className='border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                >
+                  Reset Dummy Data
+                </Button>
+              </div>
+
               <form onSubmit={handleSubmit(onSubmit)} className='space-y-10'>
                 <AnimatePresence mode='wait'>
                   {step === 0 && (
@@ -341,24 +340,21 @@ export default function Register() {
                       <div className='grid md:grid-cols-2 gap-6'>
                         <Input
                           label='First Name*'
-                          name='firstName'
-                          {...register('firstName', { required: true })}
-                          error={errors.firstName}
-                          value={formData.firstName}
-                          onChange={(e) =>
-                            setValue('firstName', e.target.value)
-                          }
                           leftIcon={<User className='h-4 w-4' />}
+                          {...register('firstName', {
+                            required: 'First name is required',
+                          })}
+                          error={errors.firstName}
                         />
                         <Input
                           label='Last Name*'
-                          name='lastName'
-                          {...register('lastName', { required: true })}
-                          error={errors.lastName}
-                          value={formData.lastName}
-                          onChange={(e) => setValue('lastName', e.target.value)}
                           leftIcon={<User className='h-4 w-4' />}
+                          {...register('lastName', {
+                            required: 'Last name is required',
+                          })}
+                          error={errors.lastName}
                         />
+
                         <DatePickerInput
                           label='Date of Birth*'
                           name='dob'
@@ -368,13 +364,13 @@ export default function Register() {
                           }
                           maxDate={new Date()}
                         />
+
                         <Select
-                          label='Gender'
-                          name='gender'
-                          {...register('gender')}
-                          value={formData.gender}
-                          onChange={(e) => setValue('gender', e.target.value)}
-                          className='w-full'
+                          label='Gender*'
+                          {...register('gender', {
+                            required: 'Gender is required',
+                          })}
+                          error={errors.gender}
                         >
                           <option value=''>Select Gender</option>
                           {genders.map((g) => (
@@ -383,16 +379,14 @@ export default function Register() {
                             </option>
                           ))}
                         </Select>
+
                         <Input
                           label='Share Code*'
-                          name='shareCode'
-                          {...register('shareCode', { required: true })}
-                          error={errors.shareCode}
-                          value={formData.shareCode}
-                          onChange={(e) =>
-                            setValue('shareCode', e.target.value)
-                          }
                           leftIcon={<Hash className='h-4 w-4' />}
+                          {...register('shareCode', {
+                            required: 'Share code is required',
+                          })}
+                          error={errors.shareCode}
                         />
                       </div>
                     </motion.div>
@@ -418,57 +412,51 @@ export default function Register() {
                       <div className='grid md:grid-cols-2 gap-6'>
                         <Input
                           label='Email*'
-                          name='email'
                           type='email'
-                          {...register('email', { required: true })}
-                          error={errors.email}
-                          value={formData.email}
-                          onChange={(e) => setValue('email', e.target.value)}
                           leftIcon={<Mail className='h-4 w-4' />}
+                          {...register('email', {
+                            required: 'Email is required',
+                          })}
+                          error={errors.email}
                         />
                         <Input
                           label='Phone*'
-                          name='phone'
-                          {...register('phone', { required: true })}
-                          error={errors.phone}
-                          value={formData.phone}
-                          onChange={(e) => setValue('phone', e.target.value)}
                           leftIcon={<Phone className='h-4 w-4' />}
+                          {...register('phone', {
+                            required: 'Phone is required',
+                          })}
+                          error={errors.phone}
                         />
                         <Input
                           label='Street Address*'
-                          name='street'
-                          {...register('street', { required: true })}
-                          error={errors.street}
-                          value={formData.street}
-                          onChange={(e) => setValue('street', e.target.value)}
                           leftIcon={<Home className='h-4 w-4' />}
+                          {...register('street', {
+                            required: 'Street is required',
+                          })}
+                          error={errors.street}
                         />
                         <Input
                           label='City*'
-                          name='city'
-                          {...register('city', { required: true })}
-                          error={errors.city}
-                          value={formData.city}
-                          onChange={(e) => setValue('city', e.target.value)}
                           leftIcon={<MapPin className='h-4 w-4' />}
+                          {...register('city', {
+                            required: 'City is required',
+                          })}
+                          error={errors.city}
                         />
                         <Input
                           label='Postcode*'
-                          name='postcode'
-                          {...register('postcode', { required: true })}
-                          error={errors.postcode}
-                          value={formData.postcode}
-                          onChange={(e) => setValue('postcode', e.target.value)}
                           leftIcon={<Landmark className='h-4 w-4' />}
+                          {...register('postcode', {
+                            required: 'Postcode is required',
+                          })}
+                          error={errors.postcode}
                         />
                         <Select
-                          label='Country'
-                          name='country'
-                          {...register('country')}
-                          value={formData.country}
-                          onChange={(e) => setValue('country', e.target.value)}
-                          className='w-full'
+                          label='Country*'
+                          {...register('country', {
+                            required: 'Country is required',
+                          })}
+                          error={errors.country}
                         >
                           <option value=''>Select Country</option>
                           {countries.map((c) => (
@@ -500,78 +488,60 @@ export default function Register() {
                       </div>
 
                       <div className='space-y-6'>
-                        {formData.employeeExperience.map((exp, index) => (
+                        {formData.experience.map((exp, index) => (
                           <div
                             key={index}
                             className='grid md:grid-cols-2 gap-6 p-4 rounded-2xl bg-[#F7F8FF] border border-[#E0E6FF]'
                           >
                             <Input
                               label='Position*'
-                              value={exp.position}
-                              onChange={(e) =>
-                                handleExperienceChange(e, index, 'position')
-                              }
-                              {...register(
-                                `employeeExperience.${index}.position`
-                              )}
                               leftIcon={<Briefcase className='h-4 w-4' />}
+                              {...register(`experience.${index}.position`, {
+                                required: 'Position is required',
+                              })}
+                              error={errors?.experience?.[index]?.position}
                             />
                             <Input
-                              label='Company*'
-                              value={exp.company}
-                              onChange={(e) =>
-                                handleExperienceChange(e, index, 'company')
-                              }
-                              {...register(
-                                `employeeExperience.${index}.company`
-                              )}
+                              label='Company'
                               leftIcon={<Building2 className='h-4 w-4' />}
+                              {...register(`experience.${index}.company`)}
                             />
+
                             <DatePickerInput
-                              label='Start Date*'
-                              name={`employeeExperience.${index}.startDate`}
+                              label='Start Date'
+                              name={`experience.${index}.startDate`}
                               value={exp.startDate}
                               onChange={(iso) => {
-                                const u = [...formData.employeeExperience]
+                                const u = [...formData.experience]
                                 u[index].startDate = iso
-                                setValue('employeeExperience', u, {
+                                setValue('experience', u, {
                                   shouldValidate: true,
                                 })
                               }}
                             />
                             <DatePickerInput
                               label='End Date'
-                              name={`employeeExperience.${index}.endDate`}
+                              name={`experience.${index}.endDate`}
                               value={exp.endDate}
                               onChange={(iso) => {
-                                const u = [...formData.employeeExperience]
+                                const u = [...formData.experience]
                                 u[index].endDate = iso
-                                setValue('employeeExperience', u, {
+                                setValue('experience', u, {
                                   shouldValidate: true,
                                 })
                               }}
                             />
                             <Input
                               label='City'
-                              value={exp.city}
-                              onChange={(e) =>
-                                handleExperienceChange(e, index, 'city')
-                              }
-                              {...register(`employeeExperience.${index}.city`)}
                               leftIcon={<MapPin className='h-4 w-4' />}
+                              {...register(`experience.${index}.city`)}
                             />
                             <Input
                               label='Country'
-                              value={exp.country}
-                              onChange={(e) =>
-                                handleExperienceChange(e, index, 'country')
-                              }
-                              {...register(
-                                `employeeExperience.${index}.country`
-                              )}
                               leftIcon={<Globe className='h-4 w-4' />}
+                              {...register(`experience.${index}.country`)}
                             />
-                            {formData.employeeExperience.length > 1 && (
+                            {formData.experience.length > 1 && (
                               <div className='md:col-span-2 text-right'>
                                 <button
                                   type='button'
@@ -598,10 +568,11 @@ export default function Register() {
                         {formData.skills.map((skill, index) => (
                           <div key={index} className='flex items-center gap-2'>
                             <Input
-                              {...register(`skills.${index}`)}
-                              value={skill}
                               label='eg. React, HTML, JavaScript'
-                              onChange={(e) => handleSkillChange(e, index)}
+                              {...register(`skills.${index}`, {
+                                required: 'Skill is required',
+                              })}
+                              error={errors?.skills?.[index]}
                               className='flex-1'
                               placeholder='Enter skill'
                             />
@@ -644,33 +615,47 @@ export default function Register() {
                       <div className='grid md:grid-cols-2 gap-6'>
                         <Input
                           label='Username*'
-                          name='username'
-                          {...register('username', { required: true })}
-                          error={errors.username}
-                          value={formData.username}
-                          onChange={(e) => setValue('username', e.target.value)}
                           leftIcon={<User className='h-4 w-4' />}
+                          autoComplete='username'
+                          {...register('username', {
+                            required: 'Username is required',
+                          })}
+                          error={errors.username}
                         />
                         <Input
                           label='Password*'
-                          name='password'
                           type='password'
-                          {...register('password', { required: true })}
-                          error={errors.password}
                           leftIcon={<Lock className='h-4 w-4' />}
+                          autoComplete='new-password'
+                          {...register('password', {
+                            required: 'Password is required',
+                          })}
+                          error={errors.password}
                         />
                         <Input
                           label='Confirm Password*'
-                          name='confirmPassword'
                           type='password'
-                          {...register('confirmPassword', { required: true })}
-                          error={errors.confirmPassword}
                           leftIcon={<Lock className='h-4 w-4' />}
+                          autoComplete='new-password'
+                          {...register('confirmPassword', {
+                            required: 'Please confirm your password',
+                            validate: (v) =>
+                              v === pw || 'Passwords do not match',
+                          })}
+                          error={errors.confirmPassword}
+                        />
+                        <DatePickerInput
+                          label='Available Start Date*'
+                          name='startDate'
+                          value={formData.startDate}
+                          onChange={(iso) =>
+                            setValue('startDate', iso, { shouldValidate: true })
+                          }
                         />
                       </div>
+
                       <div className='space-y-3'>
                         <Checkbox
-                          name='terms'
                           label={
                             <>
                               I agree to{' '}
@@ -684,11 +669,13 @@ export default function Register() {
                               </a>
                             </>
                           }
-                          {...register('terms', { required: true })}
+                          {...register('terms', {
+                            required:
+                              'You must agree to the Terms & Conditions',
+                          })}
                           error={errors.terms}
                         />
                         <Checkbox
-                          name='gdpr'
                           label={
                             <>
                               I agree to{' '}
@@ -702,7 +689,9 @@ export default function Register() {
                               </a>
                             </>
                           }
-                          {...register('gdpr', { required: true })}
+                          {...register('gdpr', {
+                            required: 'You must agree to GDPR',
+                          })}
                           error={errors.gdpr}
                         />
                       </div>
@@ -730,7 +719,7 @@ export default function Register() {
                       Continue
                     </Button>
                   ) : (
-                    <Button type='submit' size='md' loading={loading}>
+                    <Button type='submit' size='md' loading={isSubmitting}>
                       Create Account
                     </Button>
                   )}
